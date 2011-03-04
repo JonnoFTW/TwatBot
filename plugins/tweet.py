@@ -1,0 +1,11 @@
+def tweet(dataN):
+    if dataN['fool'] not in banned:
+        if (''.join(chans[dataN['chan']].split())) != "":
+            if dataN['fool'] == chans[dataN['chan']].split(':')[0]:
+                sendMsg("Can't quote yourself",dataN['chan'])
+            else:
+                toSend = chans[dataN['chan']][:140]
+                print(toSend)
+                setTwit(toSend,dataN['chan'])
+                spaces = ' '*(random.randint(1,5))  
+                sendMsg('Sending to twitter!'+spaces,dataN['chan']) 

@@ -1,0 +1,17 @@
+To make a plugin, define a function and import it to the twatbot.py
+Add it to the list of functions, it should take in a dictionary as
+defined in parser.py:
+    dic = {
+        'fool':fool,  #User who sent message
+        'msg':msg,    #The text part of the message
+        'cmd':cmd,    #The command they used: privmsg, quit etc.
+        'chan':chan,  #The channel the message was sent from, useful for replying
+        'raw':data,   #The raw server message
+        'words':words #The message split into words
+        }
+Add some docs in here about available variables and functions
+
+
+01:32 < Blice> so in the main script you can do, say, dragon.triggers
+01:33 < Blice> for plugin in plugins, if msg in plugin.triggers, plugin.triggers[msg](nick, chan)
+
