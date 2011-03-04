@@ -120,6 +120,12 @@ def parse(dataN):
         if dataN['cmd'] == 'KICK' and nick in dataN['raw']:
             del (chans[dataN['chan']]) 
         if dataN['cmd'] == 'PRIVMSG' and len(words) != 0:
+            # Run the function for the given command
+            # if it contains a '^' at the head
+            if dataN['fool'] in admins:
+                adminOpts[words[0]](dataN)
+            else:
+                options[words[0]](dataN)
             if words[0] == '^^' and dataN['fool'] not in banned:
                 if (''.join(chans[dataN['chan']].split())) != "":
                     if dataN['fool'] == chans[dataN['chan']].split(':')[0]:
@@ -174,6 +180,7 @@ def parse(dataN):
                     sendMsg('Please provide a channel to join',dataN['chan'])
             elif words[0] == '^chans':
                 sendMsg('Currently in: '+(', '.join(chans.keys())),dataN['chan'])
+            elif words[0] == '':
             elif words[0] == '^play' or playing:
                 if words[0] != '^play':
                     play(dataN['chan'],dataN['msg'])                    
@@ -182,6 +189,24 @@ def parse(dataN):
 	            playing = True
     # except :
         # pass
+options = {
+    '^cmds':listcmds,
+    '^^':post,
+    '^last':getLast,
+    '^help':help,
+    '^play':play,
+    '^chans':listChans,
+    '^ban':ban,
+    '^todo':todo
+}
+adminOpts = {
+ '^quit':close,
+ '^join':join,
+ '^part':foo,
+ '^ban':bar,
+ 
+}
+## Be sure to add an option for each available function
 
 admins = ['Jonno_FTW','Garfunkel']
 global banned
