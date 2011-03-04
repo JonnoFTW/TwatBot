@@ -9,3 +9,16 @@ def tweet(dataN):
                 setTwit(toSend,dataN['chan'])
                 spaces = ' '*(random.randint(1,5))  
                 sendMsg('Sending to twitter!'+spaces,dataN['chan']) 
+def getTwit(user):
+    try:
+        result = api.GetUserTimeline(user)[0].text
+    except:
+        result = 'Could not get twitter'
+    return result
+
+def setTwit(msg,chan):
+    try:
+        result = api.PostUpdate(msg)
+    except:
+        sendMsg( 'Could not update twitter',chan)
+ 

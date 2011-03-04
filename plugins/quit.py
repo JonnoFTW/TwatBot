@@ -1,0 +1,2 @@
+def exit():
+    close()
