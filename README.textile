@@ -1,0 +1,30 @@
+h1. TwatBot
+
+An IRC bot created to post to a specific Twitter.
+
+h3. Features
+* Ability to ban users.
+* Authenticates with the Twitter API via oAuth.
+
+h3. Requirements
+
+* Python 2.x (Python 2.7 was used in creation)
+* A Twitter account to post tweets to.
+* The python-twitter module.
+
+
+h1. Running
+
+h3. Place the file
+* Add a 'keys' file in the same directory as twatbot.py and fill it with your Twitter oAuth key.
+* Then simply start the bot with 'python twatboy.py &' which will fork the bot.
+* Or you could run it in a 'screen' session.
+
+
+h1. Using the Bot
+
+h3. Commands
+* Use '^^' to post the preceding line to Twitter, a command such as '^^ 6' which would allow you to post the 6th line preceeding to Twitter is in the pipeline.
+* Using the command '^help' will display help.
+* Use '^last' to see that last comment posted to Twitter.
+* '^chans' will display the channels that the bot is connected to.
