@@ -35,8 +35,10 @@ def ircCom(command,msg):
         print('Send timeout')
     else:
         print (tosend[:-2])
+
 def sendMsg(msg,chan):
     ircCom('PRIVMSG '+chan,':'+msg)
+
 def connect():
     global irc
     global playing
@@ -49,8 +51,9 @@ def connect():
     time.sleep(4)
     for i in chans.keys():
         joinChan(i)
-def joinChan(chan):
-    ircCom ('JOIN',chan)
+
+def chanOP(chan,op):
+    ircCom (op,chan)
 
 def close():
     global irc
@@ -152,7 +155,7 @@ def parse(dataN):
                         sendMsg('I\'m not in that channel',dataN['chan'])
                     elif chan[0] == '#':
                         del chans[chan]
-                        ircCom('PART',chan)
+                        chanOP(chan,'PART')
                     else:
                         sendMsg('Please format the channel properly',dataN['chan'])
                 else:  
@@ -164,7 +167,7 @@ def parse(dataN):
                         sendMsg('I\'m already in that channel',dataN['chan'])
                     elif chan[0] == '#':
                         chans[chan] = ''
-                        joinChan(words[1])
+                        chanOP(chan,'JOIN')
                     else:
                         sendMsg('Please format the channel properly',dataN['chan'])
                 else:
