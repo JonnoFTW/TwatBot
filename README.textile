@@ -1,10 +1,13 @@
 h1. TwatBot
 
-An IRC bot created to post to a specific Twitter.
+An IRC bot to post to Twitter.
 
 h3. Features
 * Ability to ban users.
+* Admin only commands
 * Authenticates with the Twitter API via oAuth.
+* Can play "A Dragon Eats You" on #futaba@rizon
+* Can join multiple channels on one network
 
 h3. Requirements
 
@@ -24,7 +27,12 @@ h3. Place the file
 h1. Using the Bot
 
 h3. Commands
-* Use '^^' to post the preceding line to Twitter, a command such as '^^ 6' which would allow you to post the 6th line preceeding to Twitter is in the pipeline.
+* Use '^^' to post the preceding line to Twitter
+* Stores the last 10 comments from each channel, use '^^ n' to post the nth quote to Twitter.
 * Using the command '^help' will display help.
+* '^cmds' to view all available commands
+* '^ban' to ban someone or view the current bans. Banning will post to Twitter as to who has been banned
 * Use '^last' to see that last comment posted to Twitter.
+* '^last userame' will display the last post from a specific user
 * '^chans' will display the channels that the bot is connected to.
+* '^join|part' will join/part a channel
