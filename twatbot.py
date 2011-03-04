@@ -5,14 +5,13 @@ import random
 import twitter
 import time
 
-def getKeys()
-    global keys
-    f = open('keys','r')
+def getFile(x)
+    f = open(x,'r')
     result = f.readlines()
     f.close()
     result = map(lambda x: x.rstrip('\n'),result)
     return result
-keys = getKeys()
+keys = getFile('keys')
 
 api = twitter.Api(
     keys[0],
@@ -103,15 +102,7 @@ def ban(nick):
     f.write(nick+'\n')
     f.close()
     return True
-    
-def getBans():
-    global banned
-    f = open('banned','r')
-    result = f.readlines()
-    f.close()
-    result = map(lambda x: x.rstrip('\n'),result)
-    return result
-    
+        
 def parse(dataN):
   #  try:
         global banned
@@ -191,7 +182,7 @@ def parse(dataN):
 
 admins = ['Jonno_FTW','Garfunkel']
 global banned
-banned = getBans()
+banned = getFile('banned')
 global chans
 chans = {'#futaba':'','#perwl':''}
 
