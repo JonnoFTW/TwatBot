@@ -5,6 +5,7 @@ An IRC bot to post to Twitter.
 h3. Features
 * Ability to ban users.
 * Admin only commands
+* Can't quote yourself
 * Authenticates with the Twitter API via oAuth.
 * Can play "A Dragon Eats You" on #futaba@rizon
 * Can join multiple channels on one network
@@ -36,3 +37,13 @@ h3. Commands
 * '^last userame' will display the last post from a specific user
 * '^chans' will display the channels that the bot is connected to.
 * '^join|part' will join/part a channel
+
+h1. Todo
+
+h3. Features
+* Implement scrollback for '^^ n'. Use the current chans dictionary to map to an array. Treat the array like a queue (LILO)
+* Have it show the scrollback for reference
+* Delete the last post if admin
+* Add/remove admins
+
+h3. Code
