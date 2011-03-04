@@ -1,6 +1,6 @@
 h1. TwatBot
 
-An IRC bot to post to Twitter.
+An IRC bot to post to Twitter
 
 h3. Features
 * Ability to ban users.
