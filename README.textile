@@ -3,7 +3,7 @@ h1. TwatBot
 An IRC bot to post to Twitter.
 
 h3. Features
-* Test update
+* Test update 2
 * Ability to ban users.
 * Admin only commands
 * Can't quote yourself
