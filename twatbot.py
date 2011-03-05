@@ -17,7 +17,7 @@ import plugin.last
 import plugin.tweet
 import plugin.quit
 
-def getFile(x)
+def getFile(x):
     f = open(x,'r')
     result = f.readlines()
     f.close()
@@ -34,7 +34,7 @@ api = twitter.Api(
 
 print (api.VerifyCredentials())
 
-network = 'irc.rizon.net'
+network = 'localhost'
 port = 6667
 nick = 'TwatBot'
 global irc
@@ -89,7 +89,7 @@ admins = ['Jonno_FTW','Garfunkel']
 global banned
 banned = getFile('banned')
 global chans
-chans = {'#futaba':'','#perwl':''}
+chans = {'#galaxy':''}
 
 connect()
 while True:
