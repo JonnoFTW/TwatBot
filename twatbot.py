@@ -80,7 +80,7 @@ admins = ['Jonno_FTW','Garfunkel']
 global banned
 banned = getFile('banned')
 global chans
-chans = {'#galaxy':''}
+chans = {'#perwl':''}
 
 connect()
 while True:
