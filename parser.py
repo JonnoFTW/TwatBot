@@ -33,8 +33,6 @@ def parse(dataN):
                 adminOpts[words[0]](dataN)
             else:
                 options[words[0]](dataN)            
-            elif words[0] == '^quit' and dataN['fool'] in admins:
-                close()
 
 
 options = {
