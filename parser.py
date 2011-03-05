@@ -41,18 +41,18 @@ def check(pl,data):
 
 
 plugins = [
-    ban,
-    chans,
-    dragon,
-    help,
-    last,
-    scroll,
-    tweet
+    plugins.ban,
+    plugins.chans,
+    plugins.dragon,
+    plugins.help,
+    plugins.last,
+    plugins.scroll,
+    plugins.tweet
 ]
 admingPlugins = [
-    joinpart,
-    ban,
-    quit
+    plugins.joinpart,
+    plugins.ban,
+    plugins.quit
 ]
 ## Be sure to add an option for each available function
 
