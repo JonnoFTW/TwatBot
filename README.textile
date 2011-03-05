@@ -32,11 +32,11 @@ h3. Commands
 * Stores the last 10 comments from each channel, use '^^ n' to post the nth quote to Twitter.
 * Using the command '^help' will display help.
 * '^cmds' to view all available commands
-* '^ban' to ban someone or view the current bans. Banning will post to Twitter as to who has been banned
+* '^ban' to ban someone or view the current bans. Banning will post to Twitter  who has been banned
 * Use '^last' to see that last comment posted to Twitter.
-* '^last userame' will display the last post from a specific user
+* '^last userame' will display the last post from a specific Twitter user
 * '^chans' will display the channels that the bot is connected to.
-* '^join|part' will join/part a channel
+* '^join|part' will join/part a specified channel
 
 h1. Todo
 
@@ -45,5 +45,9 @@ h3. Features
 * Have it show the scrollback for reference
 * Delete the last post if admin
 * Add/remove admins
+* Have a list of plugins
 
 h3. Code
+* Organise all functionality into plugins with a list of triggers
+* Move a socket connection to a class so that multiple networks can be joined by instantiating an object for each network
+* Eliminate bugs

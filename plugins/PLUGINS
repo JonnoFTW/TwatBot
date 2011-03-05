@@ -11,7 +11,10 @@ defined in parser.py:
         }
 Add some docs in here about available variables and functions
 
-
-01:32 < Blice> so in the main script you can do, say, dragon.triggers
-01:33 < Blice> for plugin in plugins, if msg in plugin.triggers, plugin.triggers[msg](nick, chan)
+Have a list of all plugins in twatbot.py
+Have a list of triggers defined in each plugin, eg: ['^play']
+Then
+for plugin in plugins:
+    if words[0] in plugin.triggers:
+        plugin.triggers[msg](nick, chan)
 
