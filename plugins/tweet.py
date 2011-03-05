@@ -1,3 +1,4 @@
+triggers = {'^^':tweet,'^last':last}
 def tweet(dataN):
     if dataN['fool'] not in banned:
         if (''.join(chans[dataN['chan']].split())) != "":
@@ -9,6 +10,13 @@ def tweet(dataN):
                 setTwit(toSend,dataN['chan'])
                 spaces = ' '*(random.randint(1,5))  
                 sendMsg('Sending to twitter!'+spaces,dataN['chan']) 
+
+def last(dataN):
+    if len(dataN['words']) > 1:
+        sendMsg(getTwit(data['words'][1]),dataN['chan'])
+    else:
+        sendMsg(getTwit('Buttsworth_'),dataN['chan'])
+
 def getTwit(user):
     try:
         result = api.GetUserTimeline(user)[0].text

@@ -30,30 +30,30 @@ def parse(dataN):
         if dataN['cmd'] == 'PRIVMSG' and len(words) != 0:
             # Run the function for the given command
             if dataN['fool'] in admins:
-                adminOpts[words[0]](dataN)
+                check(dict(plugins,**adminPlugins),dataN) #adminOpts[words[0]](dataN)
             else:
-                options[words[0]](dataN)            
+                check(plugins,dataN) #options[words[0]](dataN)
+
+def check(pl,data):
+    for plugin in pl:
+        if data['words'][0] in plugin.triggers:
+            plugin.triggers(data)
 
 
-options = {
-    '^cmds':listcmds,
-    '^^':post,
-    '^last':getLast,
-    '^help':help,
-    '^play':play,
-    '^chans':listChans,
-    '^ban':ban,
-    '^todo':todo
-}
-adminOpts = {
- '^quit':close,
- '^join':join,
- '^part':foo,
- '^ban':bar,
-}
-
-def listcmds(data):
-    sendMsg(data,data['chan'])
+plugins = [
+    ban,
+    chans,
+    dragon,
+    help,
+    last,
+    scroll,
+    tweet
+]
+admingPlugins = [
+    joinpart,
+    ban,
+    quit
+]
 ## Be sure to add an option for each available function
 
 

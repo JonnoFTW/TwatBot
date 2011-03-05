@@ -5,14 +5,16 @@ defined in parser.py:
         'fool':fool,  #User who sent message
         'msg':msg,    #The text part of the message
         'cmd':cmd,    #The command they used: privmsg, quit etc.
-        'chan':chan,  #The channel the message was sent from, useful for replying
+        'chan':chan,  #The channel the message was sent from, useful
+                      #for replying
         'raw':data,   #The raw server message
         'words':words #The message split into words
         }
 Add some docs in here about available variables and functions
 
-Have a list of all plugins in twatbot.py
-Have a list of triggers defined in each plugin, eg: ['^play']
+Have a list of all plugins in parser.py
+Have a dict of triggers defined in each plugin that map to the plugins
+main function, eg: ['^play':play]
 Then
 for plugin in plugins:
     if words[0] in plugin.triggers:

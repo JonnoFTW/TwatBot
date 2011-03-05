@@ -1,3 +1,4 @@
+triggers = {'^join':joinpart,'^part':joinpart}
 def joinpart(dataN):
     jp = dataN['words'][0]
     if len(dataN['words']) > 1:
