@@ -51,7 +51,7 @@ def check(pl,data):
             try:
                 plugin.triggers(data)
             except:
-                sendMsg("Plugin failed: " . (plugin.__name__) ,data['chan'])
+                sendMsg("Plugin failed: " + (plugin.__name__) ,data['chan'])
 
 
 plugins = [
