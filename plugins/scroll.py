@@ -5,6 +5,6 @@ def scroll(data):
             sendMsg("Scroll at: ".chans[data['chan']][-int(data['words'][1])],data['chan'])
         except:
             sendMsg("Perhaps if you used a number",dataN['chan'])
-    else
+    else:
         sendMsg(str(chans.list()),dataN['chan'])
 triggers = {'^scroll':scroll}
