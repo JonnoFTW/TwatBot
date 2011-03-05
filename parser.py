@@ -41,9 +41,9 @@ def parse(dataN):
         if dataN['cmd'] == 'PRIVMSG' and len(words) != 0:
             # Run the function for the given command
             if dataN['fool'] in admins:
-                check(dict(plugins,**adminPlugins),dataN)
+                check(dict(pluginList,**adminPlugins),dataN)
             else:
-                check(plugins,dataN)
+                check(pluginList,dataN)
 
 def check(pl,data):
     for plugin in pl:
@@ -53,7 +53,7 @@ def check(pl,data):
             except:
                 sendMsg("Plugin failed: " + (plugin.__name__) ,data['chan'])
 
-plugins = [
+pluginList = [
     plugins.ban,
     plugins.chans,
     plugins.dragon,
@@ -62,7 +62,7 @@ plugins = [
     plugins.tweet
 ]
 adminPlugins = [
-  #  plugins.joinpart,
+    plugins.joinpart,
     plugins.ban,
     plugins.quit
 ]
