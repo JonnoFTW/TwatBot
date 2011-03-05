@@ -67,7 +67,7 @@ def close():
 
 def joinChan(chan):
     try:
-        ircCom(chan,'JOIN')
+        ircCom('JOIN',chan)
         chans[chan] = deque([],10)
         #retrieve the last messge from the server, check if
         #success error code or not, throw error on not
