@@ -75,7 +75,8 @@ def joinChan(chan):
     except:
         out = "Could not join channel"
     return out
-               
+
+global admins               
 admins = ['Jonno_FTW','Garfunkel']
 global banned
 banned = getFile('banned')
