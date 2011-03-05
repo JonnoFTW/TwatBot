@@ -5,7 +5,6 @@ import plugins.ban
 import plugins.help
 import plugins.chans
 import plugins.joinpart
-import plugins.last
 import plugins.tweet
 import plugins.quit
 
@@ -59,7 +58,6 @@ plugins = [
     plugins.chans,
     plugins.dragon,
     plugins.help,
-    plugins.last,
     plugins.scroll,
     plugins.tweet
 ]
