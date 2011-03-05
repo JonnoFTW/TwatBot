@@ -7,6 +7,7 @@ import plugins.chans
 import plugins.joinpart
 import plugins.tweet
 import plugins.quit
+import plugins.scroll
 
 def line(data):
     data = data.rstrip('\r\n')
@@ -61,7 +62,7 @@ plugins = [
     plugins.scroll,
     plugins.tweet
 ]
-admingPlugins = [
+adminPlugins = [
     plugins.joinpart,
     plugins.ban,
     plugins.quit
