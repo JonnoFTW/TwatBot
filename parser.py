@@ -35,7 +35,7 @@ def parse(dataN):
         print (dataN['fool']+' '+dataN['chan']+': '+dataN['msg'])
         if dataN['cmd'] == 'KICK' and nick in dataN['raw']:
             del (chans[dataN['chan']]) 
-        if dataN['cmd'] == 'PRIVMSG' and len(words) != 0:
+        if dataN['cmd'] == 'PRIVMSG' and len(data['words']) != 0:
             # Run the function for the given command
             if dataN['fool'] in admins:
                 check(dict(pluginList,**adminPlugins),dataN)
