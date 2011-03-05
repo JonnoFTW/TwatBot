@@ -1,3 +1,14 @@
+#Twatbot specific
+
+import plugins.dragon
+import plugins.ban
+import plugins.help
+import plugins.chans
+import plugins.joinpart
+import plugins.last
+import plugins.tweet
+import plugins.quit
+
 def line(data):
     data = data.rstrip('\r\n')
     msg  = ''.join(data.split(':',2)[2:])
@@ -30,14 +41,17 @@ def parse(dataN):
         if dataN['cmd'] == 'PRIVMSG' and len(words) != 0:
             # Run the function for the given command
             if dataN['fool'] in admins:
-                check(dict(plugins,**adminPlugins),dataN) #adminOpts[words[0]](dataN)
+                check(dict(plugins,**adminPlugins),dataN)
             else:
-                check(plugins,dataN) #options[words[0]](dataN)
+                check(plugins,dataN)
 
 def check(pl,data):
     for plugin in pl:
         if data['words'][0] in plugin.triggers:
-            plugin.triggers(data)
+            try:
+                plugin.triggers(data)
+            except:
+                sendMsg("Plugin " . plugin.__name__ . " failed",data['chan'])
 
 
 plugins = [
@@ -54,6 +68,3 @@ admingPlugins = [
     plugins.ban,
     plugins.quit
 ]
-## Be sure to add an option for each available function
-
-
