@@ -1,5 +1,5 @@
 #Twatbot specific
-
+import twatbot
 import plugins.dragon
 import plugins.ban
 import plugins.help
