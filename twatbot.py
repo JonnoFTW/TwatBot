@@ -6,16 +6,7 @@ import twitter
 import time
 from collections import deque
 
-#Twatbot specific
 import parser
-import plugin.dragon
-import plugin.ban
-import plugin.help
-import plugin.chans
-import plugin.joinpart
-import plugin.last
-import plugin.tweet
-import plugin.quit
 
 def getFile(x):
     f = open(x,'r')

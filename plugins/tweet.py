@@ -1,4 +1,4 @@
-triggers = {'^^':tweet,'^last':last}
+
 def tweet(dataN):
     if dataN['fool'] not in banned:
         if (''.join(chans[dataN['chan']].split())) != "":
@@ -30,3 +30,4 @@ def setTwit(msg,chan):
     except:
         sendMsg( 'Could not update twitter',chan)
  
+triggers = {'^^':tweet,'^last':last}

@@ -1,4 +1,4 @@
-triggers = {'^scroll':scroll}
+
 def scroll(data):
     if len(data['words']) > 1:
         try:
@@ -7,3 +7,4 @@ def scroll(data):
             sendMsg("Perhaps if you used a number",dataN['chan'])
     else
         sendMsg(str(chans.list()),dataN['chan'])
+triggers = {'^scroll':scroll}

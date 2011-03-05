@@ -1,4 +1,4 @@
-triggers = {'^join':joinpart,'^part':joinpart}
+
 def joinpart(dataN):
     jp = dataN['words'][0]
     if len(dataN['words']) > 1:
@@ -20,4 +20,4 @@ def joinpart(dataN):
         sendMsg('Please provide a channel to '.jp,dataN['chan'])
 
 
-
+triggers = {'^join':joinpart,'^part':joinpart}

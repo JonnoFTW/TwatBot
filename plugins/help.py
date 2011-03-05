@@ -3,3 +3,4 @@ def help(dataN):
             twitter. Most recent update with ^last. View channels
             with ^chans. http://twitter.com/#!/Buttsworth_"""
             ,dataN['chan'])
+triggers = { '^help':help,'^about':help}

@@ -14,3 +14,5 @@ def ban(nick):
     f.write(nick+'\n')
     f.close()
     return True
+
+triggers = {'^ban':banned,'^bans':banned}
