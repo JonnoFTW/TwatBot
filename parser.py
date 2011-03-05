@@ -53,7 +53,6 @@ def check(pl,data):
             except:
                 sendMsg("Plugin failed: " + (plugin.__name__) ,data['chan'])
 
-
 plugins = [
     plugins.ban,
     plugins.chans,
@@ -63,7 +62,7 @@ plugins = [
     plugins.tweet
 ]
 adminPlugins = [
-    plugins.joinpart,
+  #  plugins.joinpart,
     plugins.ban,
     plugins.quit
 ]
