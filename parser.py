@@ -28,9 +28,6 @@ def line(data):
     return dic
 
 def parse(dataN):
-        global banned
-        global playing
-        global chans
         if dataN.split()[0] == 'PING':
             ircCom('PONG', dataN.split()[1][1:]) 
             return
