@@ -89,7 +89,7 @@ while True:
         dataN = irc.recv(4096)# .decode('utf-8','ignore')
     except:
         connect()
-    parser.parse(dataN)
+    parse(dataN)
     if dataN.split()[1] == 'PRIVMSG' :
     #Store the last 10 messages in an array
         dataN = line(dataN)
