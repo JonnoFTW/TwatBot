@@ -4,6 +4,7 @@ import sys
 import random
 import twitter
 import time
+from collections import deque
 
 #Twatbot specific
 import parser
@@ -14,6 +15,7 @@ import plugin.chans
 import plugin.joinpart
 import plugin.last
 import plugin.tweet
+import plugin.quit
 
 def getFile(x)
     f = open(x,'r')
@@ -71,21 +73,18 @@ def close():
     irc.shutdown(1)
     irc.close()
     sys.exit(0)
-        
-   
-def getTwit(user):
-    try:
-        result = api.GetUserTimeline(user)[0].text
-    except:
-        result = 'Could not get twitter'
-    return result
 
-def setTwit(msg,chan):
+def joinChan(chan):
     try:
-        result = api.PostUpdate(msg)
+        ircCom(chan,'JOIN')
+        chans[chan] = deque([],10)
+        #retrieve the last messge from the server, check if
+        #success error code or not, throw error on not
+        out = "Successfully joined"
     except:
-        sendMsg( 'Could not update twitter',chan)
-        
+        out = "Could not join channel"
+    return out
+               
 admins = ['Jonno_FTW','Garfunkel']
 global banned
 banned = getFile('banned')
@@ -100,11 +99,12 @@ while True:
         connect()
     parse(dataN)
     if dataN.split()[1] == 'PRIVMSG' :
+    #Store the last 10 messages in an array
         dataN = line(dataN)
         #if len(dataN['msg'].split()) != 0:
         try:
             if dataN['msg'].split()[0][0] != '^':
-                chans[dataN['chan']] = dataN['fool']+': '+dataN['msg']
+                chans[dataN['chan']].append(dataN['fool']+': '+dataN['msg'])
         except (IndexError):
             pass
 

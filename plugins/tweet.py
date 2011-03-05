@@ -4,7 +4,7 @@ def tweet(dataN):
             if dataN['fool'] == chans[dataN['chan']].split(':')[0]:
                 sendMsg("Can't quote yourself",dataN['chan'])
             else:
-                toSend = chans[dataN['chan']][:140]
+                toSend = (chans[dataN['chan']].pop())[:140]
                 print(toSend)
                 setTwit(toSend,dataN['chan'])
                 spaces = ' '*(random.randint(1,5))  

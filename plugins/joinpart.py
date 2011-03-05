@@ -14,8 +14,7 @@ def joinpart(dataN):
             if chan in (chans.keys()):
                 sendMsg('I\'m already in that channel',dataN['chan'])
             else:
-                chans[chan] = ''
-                chanOP(chan,'JOIN')  
+                sendMsg(joinChan(chan),dataN['chan'])
     else:  
         sendMsg('Please provide a channel to '.jp,dataN['chan'])
 
