@@ -57,7 +57,7 @@ class Connection:
         self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
         self.sendMsg('identify '+keys[4],'nickserv')
         time.sleep(4)
-        for i in chans.keys():
+        for i in self.chans.keys():
             self.joinChan(i)
         return irc
 
