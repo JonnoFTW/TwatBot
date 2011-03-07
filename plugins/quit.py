@@ -1,5 +1,5 @@
 
-def exit():
-    close()
+def exit(conn):
+    conn.close()
     
 triggers = {'^quit':exit,'^exit':exit}

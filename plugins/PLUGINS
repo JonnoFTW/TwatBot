@@ -1,6 +1,8 @@
 To make a plugin, define a function and import it to the twatbot.py
-Add it to the list of functions, it should take in a dictionary as
-defined in parser.py:
+Add it to the list of functions, it should take in a reference to an
+object containing a dic dataN containing information about the last
+message received from the server. This object also has methods for
+sending messages and joining channelsd:
     dic = {
         'fool':fool,  #User who sent message
         'msg':msg,    #The text part of the message
@@ -14,9 +16,6 @@ Add some docs in here about available variables and functions
 
 Have a list of all plugins in parser.py
 Have a dict of triggers defined in each plugin that map to the plugins
-main function, eg: ['^play':play]
-Then
-for plugin in plugins:
-    if words[0] in plugin.triggers:
-        plugin.triggers[msg](nick, chan)
+main function, eg: {'^play':play}
+
 

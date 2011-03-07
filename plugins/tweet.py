@@ -1,20 +1,22 @@
-def tweet(dataN):
-    if dataN['fool'] not in banned:
-        if (''.join(chans[dataN['chan']].split())) != "":
-            if dataN['fool'] == chans[dataN['chan']].split(':')[0]:
-                sendMsg("Can't quote yourself",dataN['chan'])
+def tweet(conn):
+    if conn.dataN['fool'] not in conn.banned:
+        if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":
+            if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split(':')[0]:
+                conn.sendMsg("Can't quote yourself",conn.dataN['chan'])
             else:
-                toSend = (chans[dataN['chan']].pop())[:140]
+                toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
                 print(toSend)
-                setTwit(toSend,dataN['chan'])
+                setTwit(toSend,conn.dataN['chan'])
                 spaces = ' '*(random.randint(1,5))  
-                sendMsg('Sending to twitter!'+spaces,dataN['chan']) 
+                conn.sendMsg('Sending to twitter!'+spaces,conn.dataN['chan']) 
 
-def last(dataN):
-    if len(dataN['words']) > 1:
-        sendMsg(getTwit(data['words'][1]),dataN['chan'])
+
+
+def last(conn):
+    if len(conn.dataN['words']) > 1:
+        conn.sendMsg(getTwit(conn.dataN['words'][1]),conn.dataN['chan'])
     else:
-        sendMsg(getTwit('Buttsworth_'),dataN['chan'])
+        conn.sendMsg(getTwit('Buttsworth_'),conn.dataN['chan'])
 
 def getTwit(user):
     try:
@@ -27,6 +29,6 @@ def setTwit(msg,chan):
     try:
         result = api.PostUpdate(msg)
     except:
-        sendMsg( 'Could not update twitter',chan)
+        conn.sendMsg( 'Could not update twitter',chan)
  
 triggers = {'^^':tweet,'^last':last}

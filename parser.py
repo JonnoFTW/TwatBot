@@ -9,23 +9,22 @@ import plugins.quit
 import plugins.scroll
 from heapq import merge
 
-def parse(dataN):
-        print (dataN['fool']+' '+dataN['chan']+': '+dataN['msg'])
-        if dataN['cmd'] == 'KICK' and nick in dataN['raw']:
-            del (chans[dataN['chan']]) 
-        if dataN['cmd'] == 'PRIVMSG' and len(dataN['words']) != 0:
+def parse(conn):
+        print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
+        if conn.dataN['cmd'] == 'KICK' and nick in conn.dataN['raw']:
+            del (conn.chans[conn.dataN['chan']]) 
+        if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
             # Run the function for the given command            
-            if dataN['fool'] in dataN['admins']:
-                dataN = check(list(merge(pluginList, adminPlugins)),dataN)
+            if conn.dataN['fool'] in conn.dataN['admins']:
+                conn.dataN = check(list(merge(pluginList, adminPlugins)),conn)
             else:
-                dataN = check(pluginList,dataN)
-            return dataN
+                conn.dataN = check(pluginList,conn)
 
-def check(pl,data):
+def check(pl,conn):
     for plugin in pl:
-        if data['words'][0] in plugin.triggers:
+        if conn.dataN['words'][0] in plugin.triggers:
             try:
-                out = plugin.triggers(data)
+                out = plugin.triggers(conn)
             except:
                 sendMsg("Plugin failed: " + (plugin.__name__) ,data['chan'])
             return out

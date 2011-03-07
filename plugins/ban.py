@@ -1,15 +1,14 @@
-def banned(dataN):
-    if len(dataN['words']) > 1 and dataN['fool'] in admins:
+def banned(conn):
+    if len(conn.dataN['words']) > 1 and conn.dataN['fool'] in conn.admins:
         ban(words[1])
-        banned.append(dataN['words'][1])
-        toSend = dataN['words'][1]+' is now banned from tweeting'
-        sendMsg(toSend,dataN['chan'])
+        conn.banned.append(conn.dataN['words'][1])
+        toSend = conn.dataN['words'][1]+' is now banned from tweeting'
+        conn.sendMsg(toSend,conn.dataN['chan'])
         setTwit(toSend)
     else:
-        sendMsg('Current bans are: '+(', '.join(banned)),dataN['chan'])
+        conn.sendMsg('Current bans are: '+(', '.join(conn.banned)),conn.dataN['chan'])
 
-def ban(nick):
-    global banned
+def ban(nick,conn):
     f = open('banned','a')
     f.write(nick+'\n')
     f.close()

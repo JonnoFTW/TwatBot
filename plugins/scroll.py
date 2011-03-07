@@ -1,10 +1,13 @@
 
-def scroll(data):
-    if len(data['words']) > 1:
+def scroll(conn):
+    if len(conn.dataN['words']) > 1:
         try:
-            sendMsg("Scroll at: ".chans[data['chan']][-int(data['words'][1])],data['chan'])
+            sendMsg("Scroll at "+ conn.dataN['words'][1] + ": " +list(reversed(conn.chans[dataN['chan']]))[int(words[1])],dataN['chan'])
         except:
-            sendMsg("Perhaps if you used a number",dataN['chan'])
+            sendMsg("Perhaps if you used a number < 10",dataN['chan'])
     else:
-        sendMsg(str(chans.list()),dataN['chan'])
+         sendMsg(str(list(conn.chans[dataN['chan']])),dataN['chan'])
 triggers = {'^scroll':scroll}
+
+
+
