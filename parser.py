@@ -14,9 +14,9 @@ def parse(dataN):
         if dataN['cmd'] == 'KICK' and nick in dataN['raw']:
             del (chans[dataN['chan']]) 
         if dataN['cmd'] == 'PRIVMSG' and len(dataN['words']) != 0:
-            # Run the function for the given command
-                dataN = check(list(merge(pluginList, adminPlugins)),dataN)
+            # Run the function for the given command            
             if dataN['fool'] in dataN['admins']:
+                dataN = check(list(merge(pluginList, adminPlugins)),dataN)
             else:
                 dataN = check(pluginList,dataN)
             return dataN
