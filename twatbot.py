@@ -107,10 +107,8 @@ while True:
         ircCom('PONG', dataN.split()[1][1:])
     else:
         newState = parser.parse(dataN)
-    if dataN.split()[1] == 'PRIVMSG':
-        try:
-            if dataN['msg'].split()[0][0] != '^':
-                chans[dataN['chan']].append(dataN['fool']+': '+dataN['msg'])
-        except (IndexError):
-            pass
+    if dataN['cmd'] == 'PRIVMSG':
+        if dataN['words'][0] != '^':
+            chans[dataN['chan']].append(dataN['fool']+': '+dataN['msg'])
+
 
