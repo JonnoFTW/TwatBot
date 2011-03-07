@@ -29,6 +29,7 @@ network = 'irc.rizon.net'
 port = 6667
 nick = 'TwatBot'
 
+global irc
 
 def ircCom(command,msg):
     tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
@@ -42,6 +43,7 @@ def sendMsg(msg,chan):
     ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
 
 def connect():
+    global irc
     irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
     irc.connect ((network,port))
     ircCom ('NICK',nick)
