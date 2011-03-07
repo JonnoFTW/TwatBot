@@ -37,11 +37,11 @@ class Connection:
         self.chans = {'#perwl':None,'#futaba':None}
         self.playing = False
         self.banned = getFile('banned')
-        self.irc = connect()
+        self.irc = self.connect()
         
     def ircCom(self,command,msg):
         tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
-        result = irc.send (tosend)
+        result = self.irc.send (tosend)
         if result == 0:
             print('Send timeout')
         else:
@@ -51,8 +51,8 @@ class Connection:
         self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
 
     def connect(self):
-        irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
-        irc.connect ((network,port))
+        self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
+        self.irc.connect ((network,port))
         self.ircCom ('NICK',nick)
         self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
         self.sendMsg('identify '+keys[4],'nickserv')
@@ -67,14 +67,14 @@ class Connection:
     def close(self):
         self.ircCom('QUIT',':'+nick+' away!')
         print ('Exiting')
-        irc.shutdown(1)
-        irc.close()
+        self.irc.shutdown(1)
+        self.irc.close()
         sys.exit(0)
 
     def joinChan(self,chan):
         try:
             self.ircCom('JOIN',chan)
-            chans[chan] = deque([],10)
+            self.chans[chan] = deque([],10)
             #retrieve the last messge from the server, check if
             #success error code or not, throw error on not
             out = "Successfully joined"
@@ -106,7 +106,7 @@ while True:
     try:
         dataN = irc.recv(4096)# .decode('utf-8','ignore')
     except:
-        conn.connect()
+        conn = Connection()
     conn.dataN = line(dataN)
     if conn.dataN['raw'][0] == 'PING':
         conn.ircCom('PONG', dataN.split()[1][1:])
