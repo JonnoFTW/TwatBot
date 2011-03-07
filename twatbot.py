@@ -107,7 +107,8 @@ while True:
         dataN['admins'] = newState['admins']
         dataN['chans']  = newState['chans']
         dataN['playing'] = newState['playing']
-    except NameError:
+        print "got here"
+    except (NameError,TypeError):
         dataN['admins'] = admins
         dataN['chans']  = chans
         dataN['playing'] = playing
