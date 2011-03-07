@@ -14,7 +14,7 @@ def parse(dataN):
             del (chans[dataN['chan']]) 
         if dataN['cmd'] == 'PRIVMSG' and len(dataN['words']) != 0:
             # Run the function for the given command
-            if dataN['fool'] in admins:
+            if dataN['fool'] in dataN['admins']:
                 dataN = check(dict(pluginList,**adminPlugins),dataN)
             else:
                 dataN = check(pluginList,dataN)

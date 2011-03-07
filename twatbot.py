@@ -103,6 +103,15 @@ while True:
     except:
         connect()
     dataN = line(dataN)
+    try:
+        dataN['admins'] = newState['admins']
+        dataN['chans']  = newState['chans']
+        dataN['playing'] = newState['playing']
+    except NameError:
+        dataN['admins'] = admins
+        dataN['chans']  = chans
+        dataN['playing'] = playing
+    
     if dataN['raw'][0] == 'PING':
         ircCom('PONG', dataN.split()[1][1:])
     else:
