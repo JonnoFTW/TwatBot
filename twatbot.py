@@ -104,7 +104,7 @@ conn = Connection()
 
 while True:
     try:
-        dataN = irc.recv(4096)# .decode('utf-8','ignore')
+        dataN = conn.irc.recv(4096)# .decode('utf-8','ignore')
     except:
         conn = Connection()
     conn.dataN = line(dataN)
