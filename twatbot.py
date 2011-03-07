@@ -99,7 +99,7 @@ def line(data):
         }
     return dic
     
-conn = connect()
+conn = Connection()
 
 while True:
     try:
