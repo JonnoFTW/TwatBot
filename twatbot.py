@@ -59,7 +59,7 @@ class Connection:
         time.sleep(4)
         for i in self.chans.keys():
             self.joinChan(i)
-        return irc
+        return self.irc
 
     def chanOP(self,chan,op):
         self.ircCom (op,chan)
