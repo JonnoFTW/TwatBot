@@ -33,11 +33,11 @@ class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self):
-        admins = ['Jonno_FTW','Garfunkel']
-        chans = {'#perwl':None,'#futaba':None}
-        playing = False
-        banned = getFile('banned')
-        irc = connect()
+        self.admins = ['Jonno_FTW','Garfunkel']
+        self.chans = {'#perwl':None,'#futaba':None}
+        self.playing = False
+        self.banned = getFile('banned')
+        self.irc = connect()
         
     def ircCom(self,command,msg):
         tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
@@ -51,7 +51,7 @@ class Connection:
         self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
 
     def connect(self):
-        self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
+        irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         irc.connect ((network,port))
         self.ircCom ('NICK',nick)
         self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
