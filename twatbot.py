@@ -28,10 +28,9 @@ print (api.VerifyCredentials())
 network = 'irc.rizon.net'
 port = 6667
 nick = 'TwatBot'
-global irc
-global playing
+
+
 def ircCom(command,msg):
-    global irc
     tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
     result = irc.send (tosend)
     if result == 0:
@@ -43,13 +42,10 @@ def sendMsg(msg,chan):
     ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
 
 def connect():
-    global irc
-    global playing
     irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
     irc.connect ((network,port))
     ircCom ('NICK',nick)
     ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
-    playing = False
     sendMsg('identify '+keys[4],'nickserv')
     time.sleep(4)
     for i in chans.keys():
@@ -76,24 +72,40 @@ def joinChan(chan):
         out = "Could not join channel"
     return out
 
-global admins               
+def line(data):
+    data = data.rstrip('\r\n')
+    msg  = ''.join(data.split(':',2)[2:])
+    words= msg.split()
+    data = data.split()
+    fool = data[0].split('!')[0][1:]
+    cmd  = data[1]
+    chan = data[2]
+    dic = {
+        'fool':fool,
+        'msg':msg,
+        'cmd':cmd,
+        'chan':chan,
+        'words':words,
+        'raw':data
+        }
+    return dic
+         
 admins = ['Jonno_FTW','Garfunkel']
-global banned
-banned = getFile('banned')
-global chans
 chans = {'#perwl':''}
-
+playing = False
 connect()
+
 while True:
     try:
         dataN = irc.recv(4096)# .decode('utf-8','ignore')
     except:
         connect()
-    parser.parse(dataN)
-    if dataN.split()[1] == 'PRIVMSG' :
-    #Store the last 10 messages in an array
-        dataN = line(dataN)
-        #if len(dataN['msg'].split()) != 0:
+    dataN = line(dataN)
+    if dataN['raw'].split()[0] == 'PING':
+        ircCom('PONG', dataN.split()[1][1:])
+    else:
+        newState = parser.parse(dataN)
+    if dataN.split()[1] == 'PRIVMSG':
         try:
             if dataN['msg'].split()[0][0] != '^':
                 chans[dataN['chan']].append(dataN['fool']+': '+dataN['msg'])

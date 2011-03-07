@@ -1,4 +1,3 @@
-
 def tweet(dataN):
     if dataN['fool'] not in banned:
         if (''.join(chans[dataN['chan']].split())) != "":
