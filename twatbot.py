@@ -108,6 +108,7 @@ while True:
     except:
         conn = Connection()
     conn.dataN = line(dataN)
+    print conn.dataN
     if conn.dataN['raw'][0] == 'PING':
         conn.ircCom('PONG', dataN.split()[1][1:])
     else:
