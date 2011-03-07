@@ -103,7 +103,7 @@ while True:
     except:
         connect()
     dataN = line(dataN)
-    if dataN['raw'].split()[0] == 'PING':
+    if dataN['raw'][0] == 'PING':
         ircCom('PONG', dataN.split()[1][1:])
     else:
         newState = parser.parse(dataN)
