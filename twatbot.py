@@ -34,7 +34,7 @@ class Connection:
     and related information"""
     def __init__(self):
         admins = ['Jonno_FTW','Garfunkel']
-        chans = {'#perwl':'','#futaba':''}
+        chans = {'#perwl':None,'#futaba':None}
         playing = False
         banned = getFile('banned')
         
@@ -47,24 +47,23 @@ class Connection:
             print (tosend[:-2])
 
     def sendMsg(self,msg,chan):
-        ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
+        self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
 
     def connect(self):
-        global irc
         irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         irc.connect ((network,port))
-        ircCom ('NICK',nick)
-        ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
-        sendMsg('identify '+keys[4],'nickserv')
+        self.ircCom ('NICK',nick)
+        self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
+        self.sendMsg('identify '+keys[4],'nickserv')
         time.sleep(4)
         for i in chans.keys():
-            joinChan(i)
+            self.joinChan(i)
 
     def chanOP(self,chan,op):
-        ircCom (op,chan)
+        self.ircCom (op,chan)
 
     def close(self):
-        ircCom('QUIT',':'+nick+' away!')
+        self.ircCom('QUIT',':'+nick+' away!')
         print ('Exiting')
         irc.shutdown(1)
         irc.close()
@@ -72,7 +71,7 @@ class Connection:
 
     def joinChan(self,chan):
         try:
-            ircCom('JOIN',chan)
+            self.ircCom('JOIN',chan)
             chans[chan] = deque([],10)
             #retrieve the last messge from the server, check if
             #success error code or not, throw error on not
