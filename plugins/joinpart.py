@@ -1,5 +1,5 @@
 def joinpart(conn):
-    jp = conn.conn.dataN['words'][0]
+    jp = conn.dataN['words'][0]
     if len(conn.dataN['words']) > 1:
         chan = conn.dataN['words'][1]
         if chan[0] != '#':
@@ -8,7 +8,7 @@ def joinpart(conn):
             if chan not in (conn.chans.keys()):
                 conn.sendMsg('I\'m not in that channel',conn.dataN['chan'])
             else:
-                del chans[chan]
+                del conn.chans[chan]
                 conn.chanOP(chan,'PART')
         elif jp == '^join':
             if chan in (conn.chans.keys()):
