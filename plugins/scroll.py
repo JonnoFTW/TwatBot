@@ -4,7 +4,7 @@ def scroll(conn):
         try:
             conn.sendMsg("Scroll at "+ conn.dataN['words'][1] + ": " +list(reversed(conn.chans[conn.dataN['chan']]))[int(words[1])],conn.dataN['chan'])
         except:
-            conn.sendMsg("Perhaps if you used a number < 10"+ (' '*(random.randint(1,5)),conn.dataN['chan'])
+            conn.sendMsg("Perhaps if you used a number < 10"+ (' '*(random.randint(1,5))),conn.dataN['chan'])
     else:
          sendMsg(str(list(conn.chans[dataN['chan']])),conn.dataN['chan'])
 triggers = {'^scroll':scroll}
