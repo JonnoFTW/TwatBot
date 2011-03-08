@@ -27,7 +27,7 @@ def check(pl,conn):
                 plugin.triggers(conn)
             except:
                 conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.dataN['chan'])
-            return out
+            return
 
 pluginList = [
     plugins.ban,
