@@ -8,8 +8,11 @@ import plugins.tweet
 import plugins.quit
 import plugins.scroll
 from heapq import merge
+import traceback
+
 
 def parse(conn):
+    exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
     if conn.dataN['cmd'] == 'KICK' and nick in conn.dataN['raw']:
         del (conn.chans[conn.dataN['chan']]) 
@@ -26,6 +29,7 @@ def check(pl,conn):
             try:
                 plugin.triggers(conn)
             except:
+                traceback.print_tb(exceptionTraceback)
                 conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.dataN['chan'])
             return
 
