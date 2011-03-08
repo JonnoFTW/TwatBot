@@ -24,7 +24,7 @@ def check(pl,conn):
     for plugin in pl:
         if conn.dataN['words'][0] in plugin.triggers:
             try:
-                out = plugin.triggers(conn)
+                plugin.triggers(conn)
             except:
                 sendMsg("Plugin failed: " + (plugin.__name__) ,data['chan'])
             return out

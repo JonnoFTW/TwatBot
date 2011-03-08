@@ -72,15 +72,9 @@ class Connection:
         sys.exit(0)
 
     def joinChan(self,chan):
-        try:
-            self.ircCom('JOIN',chan)
-            self.chans[chan] = deque([],10)
-            #retrieve the last messge from the server, check if
-            #success error code or not, throw error on not
-            out = "Successfully joined"
-        except:
-            out = "Could not join channel"
-        return out
+        self.ircCom('JOIN',chan)
+        self.chans[chan] = deque([],10)
+
 
 def line(data):
     data = data.rstrip('\r\n')
@@ -108,13 +102,12 @@ while True:
     except:
         conn = Connection()
     conn.dataN = line(dataN)
-    print conn.dataN
     if conn.dataN['raw'][0] == 'PING':
         conn.ircCom('PONG', dataN.split()[1][1:])
     else:
         parser.parse(conn)
     if conn.dataN['cmd'] == 'PRIVMSG':
         if conn.dataN['words'][0] != '^':
-            conn.chans[dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
+            conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
 
 
