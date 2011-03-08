@@ -33,6 +33,7 @@ class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self):
+        self.api = api
         self.admins = ['Jonno_FTW','Garfunkel']
         self.chans = {'#perwl':None,'#futaba':None}
         self.playing = False
@@ -74,7 +75,20 @@ class Connection:
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
+        
+    def getTwit(self,user):
+        try:
+            result = self.api.GetUserTimeline(user)[0].text
+        except:
+            result = 'Could not get twitter'
+        return result
 
+    def setTwit(self,msg,chan):
+        try:
+            result = self.api.PostUpdate(msg)
+            return result
+        except:
+            self.sendMsg( 'Could not update twitter',chan)
 
 def line(data):
     data = data.rstrip('\r\n')
