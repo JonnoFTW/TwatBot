@@ -26,7 +26,7 @@ def check(pl,conn):
             try:
                 plugin.triggers(conn)
             except:
-                conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.data['chan'])
+                conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.dataN['chan'])
             return out
 
 pluginList = [
