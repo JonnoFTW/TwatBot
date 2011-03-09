@@ -9,7 +9,7 @@ import plugins.quit
 import plugins.scroll
 from heapq import merge
 import traceback
-
+import sys
 
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
