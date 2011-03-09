@@ -28,9 +28,8 @@ def check(pl,conn):
         if conn.dataN['words'][0] in plugin.triggers:
             try:
                 plugin.triggers[conn.dataN['words'][0]](conn)
-            except:
-                #traceback.print_tb(exceptionTraceback)
-                conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.dataN['chan'])
+            except Exception, err:
+                conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
             return
 
 pluginList = [

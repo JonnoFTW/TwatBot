@@ -1,3 +1,4 @@
+import random
 def tweet(conn):
     if conn.dataN['fool'] not in conn.banned:
         if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":

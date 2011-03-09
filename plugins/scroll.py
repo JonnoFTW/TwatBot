@@ -1,4 +1,4 @@
-
+import random
 def scroll(conn):
     if len(conn.dataN['words']) > 1:
         try:
@@ -6,7 +6,7 @@ def scroll(conn):
         except:
             conn.sendMsg("Perhaps if you used a number < 10"+ (' '*(random.randint(1,5))),conn.dataN['chan'])
     else:
-         sendMsg(str(list(conn.chans[dataN['chan']])),conn.dataN['chan'])
+         conn.sendMsg(str(list(conn.chans[conn.dataN['chan']])),conn.dataN['chan'])
 triggers = {'^scroll':scroll}
 
 
