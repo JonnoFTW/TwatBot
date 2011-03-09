@@ -27,9 +27,9 @@ def check(pl,conn):
     for plugin in pl:
         if conn.dataN['words'][0] in plugin.triggers:
             try:
-                plugin.triggers(conn)
+                plugin.triggers[conn.dataN['msg']](conn)
             except:
-                traceback.print_tb(exceptionTraceback)
+                #traceback.print_tb(exceptionTraceback)
                 conn.sendMsg("Plugin failed: " + plugin.__name__ ,conn.dataN['chan'])
             return
 
