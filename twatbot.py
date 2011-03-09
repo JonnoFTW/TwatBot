@@ -70,7 +70,7 @@ class Connection:
         print ('Exiting')
         self.irc.shutdown(1)
         self.irc.close()
-        sys.exit(0)
+        sys.exit(1)
 
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -113,12 +113,14 @@ conn = Connection()
 while True:
     try:
         dataN = conn.irc.recv(4096)# .decode('utf-8','ignore')
+ #       print dataN
     except:
         conn = Connection()
-    conn.dataN = line(dataN)
-    if conn.dataN['raw'][0] == 'PING':
+        continue
+    if dataN.split()[0] == 'PING':
         conn.ircCom('PONG', dataN.split()[1][1:])
     else:
+        conn.dataN = line(dataN)
         parser.parse(conn)
     if conn.dataN['cmd'] == 'PRIVMSG':
         if conn.dataN['words'][0] != '^':
