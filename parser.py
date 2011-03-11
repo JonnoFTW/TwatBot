@@ -14,7 +14,7 @@ import sys
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
-    if conn.dataN['cmd'] == 'KICK' and nick in conn.dataN['raw']:
+    if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
         del (conn.chans[conn.dataN['chan']]) 
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
         # Run the function for the given command            

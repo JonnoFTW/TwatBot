@@ -39,6 +39,7 @@ class Connection:
         self.playing = False
         self.banned = getFile('banned')
         self.irc = self.connect()
+	self.nick = nick
         
     def ircCom(self,command,msg):
         tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
@@ -122,8 +123,8 @@ while True:
     else:
         conn.dataN = line(dataN)
         parser.parse(conn)
-    if conn.dataN['cmd'] == 'PRIVMSG':
-        if conn.dataN['words'][0] != '^':
-            conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
+        if conn.dataN['cmd'] == 'PRIVMSG':
+            if conn.dataN['words'][0][0] != '^':
+                conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
 
 

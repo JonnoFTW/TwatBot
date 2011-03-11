@@ -5,7 +5,10 @@ def tweet(conn):
             if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split(':')[0]:
                 conn.sendMsg("Can't quote yourself",conn.dataN['chan'])
             else:
-                toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
+                if len(conn.dataN['words']) > 1:
+                   toSend = conn.chans[conn.dataN['chan']][int(conn.dataN['words'][1])]
+		else:
+                    toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
                 print(toSend)
                 conn.setTwit(toSend,conn.dataN['chan'])
                 spaces = ' '*(random.randint(1,5))  
