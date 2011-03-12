@@ -1,3 +1,4 @@
+help = "Admin only, joins or parts the specified channel"
 def joinpart(conn):
     jp = conn.dataN['words'][0]
     if len(conn.dataN['words']) > 1:

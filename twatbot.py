@@ -67,7 +67,8 @@ class Connection:
         self.ircCom (op,chan)
 
     def close(self):
-        self.ircCom('QUIT',':'+nick+' away!')
+        self.ircCom('QUIT',":I don't quit, I wait")
+        time.sleep(1)
         print ('Exiting')
         self.irc.shutdown(1)
         self.irc.close()
@@ -114,21 +115,19 @@ conn = Connection()
 while True:
     try:
         dataN = conn.irc.recv(4096)# .decode('utf-8','ignore')
- #       print dataN
-    except:
-        conn = Connection()
-        continue
-    try:
         if dataN.split()[0] == 'PING':
             conn.ircCom('PONG', dataN.split()[1][1:])
+            continue
     except IndexError:
         conn = Connection()
         continue
-    else:
-        conn.dataN = line(dataN)
-        parser.parse(conn)
-        if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
+    conn.dataN = line(dataN)
+    parser.parse(conn)
+    if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
+        try:
             if conn.dataN['words'][0][0] != '^':
                 conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
+        except IndexError:
+            pass
 
 

@@ -1,3 +1,4 @@
+help = "Plays a dragon eats you on #futaba@rizon"
 def play(conn):    
     if not conn.playing:
         conn.sendMsg('!play',conn.dataN['chan'])

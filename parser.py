@@ -17,7 +17,13 @@ def parse(conn):
     if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
         del (conn.chans[conn.dataN['chan']]) 
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
-        # Run the function for the given command            
+        if conn.dataN['words'][0] == '^cmds':
+           trigs = []
+           for i in list(merge(pluginList, adminPlugins)):
+               trigs.append(i.triggers.keys())
+           conn.sendMsg(str(trigs),conn.dataN['chan'])
+           return
+        # Run the function for the given command
         if conn.dataN['fool'] in conn.admins:
             check(list(merge(pluginList, adminPlugins)),conn)
         else:
@@ -26,11 +32,18 @@ def parse(conn):
 def check(pl,conn):
     for plugin in pl:
         if conn.dataN['words'][0] in plugin.triggers:
-            try:
-                plugin.triggers[conn.dataN['words'][0]](conn)
-            except Exception, err:
-                conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
-            return
+            if conn.dataN['msg'].find('help') != -1:
+                try:
+                    conn.sendMsg(plugin.help,conn.dataN['chan'])
+                    return
+                except: 
+                    conn.sendMsg("No help available",conn.dataN['chan'])
+		    return
+            else:            
+                try:
+                    plugin.triggers[conn.dataN['words'][0]](conn)
+                except Exception, err:
+                    conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
 
 pluginList = [
     plugins.ban,

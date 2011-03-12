@@ -1,4 +1,4 @@
-
+help = "Rehab is for quitters"
 def exit(conn):
     conn.close()
     
