@@ -1,27 +1,27 @@
 h1. TwatBot
 
-An IRC bot to post to Twitter.
+An IRC bot to post to Twitter with plugin extensibility..
 
 h3. Features
-* Test update 2
 * Ability to ban users.
 * Admin only commands
 * Can't quote yourself
 * Authenticates with the Twitter API via oAuth.
 * Can play "A Dragon Eats You" on #futaba@rizon
 * Can join multiple channels on one network
+* Simple plugin system
 
 h3. Requirements
 
 * Python 2.x (Python 2.7 was used in creation)
 * A Twitter account to post tweets to.
-* The python-twitter module.
+* The python-twitter module and its dependencies.
 
 
 h1. Running
 
 h3. Place the file
-* Add a 'keys' file in the same directory as twatbot.py and fill it with your Twitter oAuth key.
+* Add a 'keys' file in the same directory as twatbot.py and fill it with your Twitter oAuth key and ident for nickserv. Each seperated by a newline
 * Then simply start the bot with 'python twatboy.py &' which will fork the bot.
 * Or you could run it in a 'screen' session.
 
@@ -42,13 +42,14 @@ h3. Commands
 h1. Todo
 
 h3. Features
-* Implement scrollback for '^^ n'. Use the current chans dictionary to map to an array. Treat the array like a queue (LILO)
-* Have it show the scrollback for reference
+* COMPLETED: Implement scrollback for '^^ n'. Use the current chans dictionary to map to an array. Treat the array like a queue (LILO)
+* COMPLETED: Have it show the scrollback for reference
 * Delete the last post if admin
 * Add/remove admins
-* Have a list of plugins
+* COMPLETED: Have a list of plugins
 
 h3. Code
-* Organise all functionality into plugins with a list of triggers
-* Move a socket connection to a class so that multiple networks can be joined by instantiating an object for each network
+* COMPLETED: Organise all functionality into plugins with a list of triggers
+* COMPLETED: Move a socket connection to a class so that multiple networks can be joined by instantiating an object for each network
+* Convert the code to use the Twisted framework
 * Eliminate bugs
