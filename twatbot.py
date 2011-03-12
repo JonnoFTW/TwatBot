@@ -118,12 +118,16 @@ while True:
     except:
         conn = Connection()
         continue
-    if dataN.split()[0] == 'PING':
-        conn.ircCom('PONG', dataN.split()[1][1:])
+    try:
+        if dataN.split()[0] == 'PING':
+            conn.ircCom('PONG', dataN.split()[1][1:])
+    except IndexError:
+        conn = Connection()
+        continue
     else:
         conn.dataN = line(dataN)
         parser.parse(conn)
-        if conn.dataN['cmd'] == 'PRIVMSG':
+        if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
             if conn.dataN['words'][0][0] != '^':
                 conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
 
