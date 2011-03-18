@@ -19,9 +19,9 @@ def tweet(conn):
 
 def last(conn):
     if len(conn.dataN['words']) > 1:
-        conn.sendMsg(filter(lambda x: x not in ['#'],conn.getTwit(conn.dataN['words'][1]).rstrip('\n')) ,conn.dataN['chan'])
+        conn.sendMsg(conn.getTwit(filter(lambda x: ord(x) > 16,conn.dataN['words'][1])) ,conn.dataN['chan'])
     else:
-        conn.sendMsg(conn.getTwit('Buttsworth_'),conn.dataN['chan'])
+        conn.sendMsg(conn.getTwit('Buttsworth_').replace('/\r\n|\r|\n/g',''),conn.dataN['chan'])
 
 
 triggers = {'^^':tweet,'^last':last}
