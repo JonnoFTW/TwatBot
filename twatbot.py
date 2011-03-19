@@ -118,7 +118,7 @@ while True:
         if dataN.split()[0] == 'PING':
             conn.ircCom('PONG', dataN.split()[1][1:])
             continue
-    except Exception:
+    except :
         conn = Connection()
         continue
     conn.dataN = line(dataN)
