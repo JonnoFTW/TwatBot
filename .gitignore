@@ -1,1 +1,3 @@
 keys
+*.pyc
+plugins/*.pyc
