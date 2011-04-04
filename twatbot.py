@@ -25,7 +25,8 @@ api = twitter.Api(
 
 print (api.VerifyCredentials())
 
-network = 'irc.rizon.net'
+#network = 'irc.rizon.net'
+network = '65.23.158.132'
 port = 6667
 nick = 'TwatBot'
 
@@ -54,6 +55,7 @@ class Connection:
 
     def connect(self):
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
+        self.irc.settimeout(30)
         self.irc.connect ((network,port))
         self.ircCom ('NICK',nick)
         self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
@@ -65,13 +67,14 @@ class Connection:
 
     def chanOP(self,chan,op):
         self.ircCom (op,chan)
-
+    def decon(self):
+        self.irc.shutdown(1)
+        self.irc.close()
     def close(self):
         self.ircCom('QUIT',":I don't quit, I wait")
         time.sleep(1)
         print ('Exiting')
-        self.irc.shutdown(1)
-        self.irc.close()
+        self.decon()
         sys.exit(1)
 
     def joinChan(self,chan):
@@ -119,6 +122,7 @@ while True:
             conn.ircCom('PONG', dataN.split()[1][1:])
             continue
     except :
+        conn.decon()
         conn = Connection()
         continue
     conn.dataN = line(dataN)
