@@ -55,7 +55,7 @@ class Connection:
 
     def connect(self):
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
-        self.irc.settimeout(30)
+        self.irc.settimeout(300)
         self.irc.connect ((network,port))
         self.ircCom ('NICK',nick)
         self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
