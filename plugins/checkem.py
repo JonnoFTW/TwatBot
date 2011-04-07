@@ -8,10 +8,11 @@ def getPostCount(board):
    #Filter out the post numbers
    no = max(map(lambda x: re.sub("[^0-9]","",x),filter(lambda x: (x[:6] == 'id=\"no'),page.split())))
    return no
+boards = ['a','b','c','d','e','f','g','gif','h','hr','k','m','o','p','r','s','t','u','v','w','wg','i','ic','cm','y','3','adv','an','cgl','ck','co','fa','fit','int','jp','lit','mu','n','po','sci','soc','sp','tg','toy','trv','tv','vp','x']
 def getNo(conn):
     if len(conn.dataN['words']) > 1:
         chan = conn.dataN['words'][1].lower()
-        if chan not in ['a','b','v','g']:
+        if chan not in boards:
             conn.sendMsg('Please select an actual channel',conn.dataN['chan'])
         else:
             conn.sendMsg('Current post for '+chan+' is:'+getPostCount(chan),conn.dataN['chan'])    
