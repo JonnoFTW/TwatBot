@@ -36,7 +36,7 @@ class Connection:
     def __init__(self):
         self.api = api
         self.admins = ['Jonno_FTW','Garfunkel']
-        self.chans = {'#perwl':None,'#futaba':None}
+        self.chans = {'#perwl':None,'#futaba':None,"#check'em":None}
         self.playing = False
         self.banned = getFile('banned')
         self.irc = self.connect()

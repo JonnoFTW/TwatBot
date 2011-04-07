@@ -7,6 +7,7 @@ import plugins.joinpart
 import plugins.tweet
 import plugins.quit
 import plugins.scroll
+import plugins.checkem
 from heapq import merge
 import traceback
 import sys
@@ -51,7 +52,8 @@ pluginList = [
     plugins.dragon,
     plugins.help,
     plugins.scroll,
-    plugins.tweet
+    plugins.tweet,
+    plugins.checkem
 ]
 adminPlugins = [
     plugins.joinpart,
