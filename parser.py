@@ -15,8 +15,11 @@ import sys
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
-    if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
-        del (conn.chans[conn.dataN['chan']]) 
+   # if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
+   #     try:
+   #         del (conn.chans[conn.dataN['chan']]) 
+   #     except Exception,e:
+   #         print "Failed to remove; %s" % (str(e)) 
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
         if conn.dataN['words'][0] == '^cmds':
            trigs = []
@@ -27,7 +30,7 @@ def parse(conn):
         # Run the function for the given command
         if conn.dataN['fool'] in conn.admins:
             check(list(merge(pluginList, adminPlugins)),conn)
-        else:
+        elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
 
 def check(pl,conn):

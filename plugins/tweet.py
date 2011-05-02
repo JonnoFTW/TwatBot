@@ -14,8 +14,8 @@ def tweet(conn):
                     toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
                 print(toSend)
                 conn.setTwit(toSend,conn.dataN['chan'])
-                spaces = ' '*(random.randint(1,5))  
-                conn.sendMsg('Sending to twitter!'+spaces,conn.dataN['chan']) 
+                spaces = '!'*(random.randint(0,2))  
+                conn.sendMsg('Sending to twitter'+spaces,conn.dataN['chan']) 
 
 def last(conn):
     if len(conn.dataN['words']) > 1:

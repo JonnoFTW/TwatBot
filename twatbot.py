@@ -25,8 +25,8 @@ api = twitter.Api(
 
 print (api.VerifyCredentials())
 
-#network = 'irc.rizon.net'
-network = '65.23.158.132'
+network = 'irc.rizon.net'
+#network = '65.23.158.132'
 port = 6667
 nick = 'TwatBot'
 
