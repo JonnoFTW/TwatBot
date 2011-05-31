@@ -7,7 +7,12 @@ def scroll(conn):
         except Exception, err:
             conn.sendMsg("Perhaps if you used a number < 10, "+str(err)+ (' '*(random.randint(1,5))),conn.dataN['chan'])
     else:
-         conn.sendMsg(str(list(conn.chans[conn.dataN['chan']])),conn.dataN['chan'])
+        count = 0
+        tosend = ''
+        for i in list(conn.chans[conn.dataN['chan']]):
+            tosend+= str(count)+': '+i.decode('utf-8','replace')+' | '
+            count +=1
+        conn.sendMsg(tosend,conn.dataN['chan'])
 triggers = {'^scroll':scroll}
 
 

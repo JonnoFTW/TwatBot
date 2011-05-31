@@ -8,6 +8,7 @@ import plugins.tweet
 import plugins.quit
 import plugins.scroll
 import plugins.checkem
+import plugins.markov
 from heapq import merge
 import traceback
 import sys
@@ -56,7 +57,8 @@ pluginList = [
     plugins.help,
     plugins.scroll,
     plugins.tweet,
-    plugins.checkem
+    plugins.checkem,
+    plugins.markov
 ]
 adminPlugins = [
     plugins.joinpart,

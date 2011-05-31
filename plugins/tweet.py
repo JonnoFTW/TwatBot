@@ -5,7 +5,7 @@ def tweet(conn):
     if conn.dataN['fool'] not in conn.banned:
         if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":
             if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split(':')[0]:
-                conn.sendMsg("Can't quote yourself",conn.dataN['chan'])
+                conn.sendMsg("Can't quote yourself"+( '!'*(random.randint(0,2))),conn.dataN['chan'])
             else:
                 if len(conn.dataN['words']) > 1:
 #		   if conn.chans[conn.dataN['words']][int(conn.dataN['words'][1])] = 

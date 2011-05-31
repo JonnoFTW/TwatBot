@@ -4,6 +4,7 @@ import sys
 import random
 import twitter
 import time
+import plugins.markov
 from collections import deque
 
 import parser
@@ -41,6 +42,7 @@ class Connection:
         self.banned = getFile('banned')
         self.irc = self.connect()
 	self.nick = nick
+	self.log = open('text.log','a+')
         
     def ircCom(self,command,msg):
         tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
@@ -58,7 +60,7 @@ class Connection:
         self.irc.settimeout(300)
         self.irc.connect ((network,port))
         self.ircCom ('NICK',nick)
-        self.ircCom ('USER',nick+ ' 0 * :Miscellaneous Bot')
+        self.ircCom ('USER',nick+ ' x * :Segwinton Buttsworthy')
         self.sendMsg('identify '+keys[4],'nickserv')
         time.sleep(4)
         for i in self.chans.keys():
@@ -72,9 +74,10 @@ class Connection:
         self.irc.close()
     def close(self):
         self.ircCom('QUIT',":I don't quit, I wait")
-        time.sleep(1)
+        time.sleep(2)
         print ('Exiting')
         self.decon()
+        self.log.close()
         sys.exit(1)
 
     def joinChan(self,chan):
@@ -94,6 +97,8 @@ class Connection:
             return result
         except:
             self.sendMsg( 'Could not update twitter',chan)
+    def setMarkov(self,obj):
+        self.markov = obj
 
 def line(data):
     data = data.rstrip('\r\n')
@@ -130,6 +135,8 @@ while True:
     if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
         try:
             if conn.dataN['words'][0][0] != '^':
+                if conn.dataN['msg'].find('http') == -1 or conn.dataN['msg'].count('.') < 8:
+                    conn.log.write(conn.dataN['msg']+'\n')
                 conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
             pass
