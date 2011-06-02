@@ -37,7 +37,7 @@ class Connection:
     def __init__(self):
         self.api = api
         self.admins = ['Jonno_FTW','Garfunkel']
-        self.chans = {'#perwl':None,'#futaba':None,"#check'em":None}
+        self.chans = {'#perwl':None,'#futaba':None,"#check'em":None,'#/g/tv':None}
         self.playing = False
         self.banned = getFile('banned')
         self.irc = self.connect()
@@ -135,7 +135,7 @@ while True:
     if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
         try:
             if conn.dataN['words'][0][0] != '^':
-                if conn.dataN['msg'].find('http') == -1 or conn.dataN['msg'].count('.') < 8:
+                if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
                     conn.log.write(conn.dataN['msg']+'\n')
                 conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:

@@ -9,6 +9,7 @@ import plugins.quit
 import plugins.scroll
 import plugins.checkem
 import plugins.markov
+import plugins.markovgenpy
 from heapq import merge
 import traceback
 import sys

@@ -29,16 +29,16 @@ def firstrun(conn):
 #    f = open('text.log','r')
     start = time.time()
     #conn.log.seek(0,0)
-    conn.setMarkov(pickle.load(open('markov.pickle')))
+    conn.setMarkov(markovgenpy.Markov(conn.log))
+    #conn.setMarkov(pickle.load(open('markov.pickle')))
     finish = time.time()
     conn.sendMsg('Built markov object in %5g s' %(finish-start),conn.dataN['chan'])
 
 def markov(conn):
-    #try:
-        conn.sendMsg(conn.markov.generate_markov_text(),conn.dataN['chan'])
-    #except Exception, e:
-    #    conn.sendMsg('error ' + str(e),conn.dataN['chan'])
-    #    conn.sendMsg('Generating database',conn.dataN['chan'])
-    #    firstrun(conn)
+    try:
+        conn.sendMsg(conn.markov.generate_markov_text(random.randint(5,20)),conn.dataN['chan'])
+    except Exception, e:
+        conn.sendMsg('Generating database',conn.dataN['chan'])
+        firstrun(conn)
 
 triggers = { '^markov':markov,'^markovgen':firstrun}
