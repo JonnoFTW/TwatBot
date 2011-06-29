@@ -8,7 +8,7 @@ def banned(conn):
     else:
         conn.sendMsg('Current bans are: '+(', '.join(conn.banned)),conn.dataN['chan'])
 
-def ban(nick,conn):
+def ban(nick):
     f = open('banned','a')
     f.write(nick+'\n')
     f.close()

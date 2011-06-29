@@ -10,6 +10,7 @@ import plugins.scroll
 import plugins.checkem
 import plugins.markov
 import plugins.markovgenpy
+import plugins.laughter
 from heapq import merge
 import traceback
 import sys
@@ -17,11 +18,15 @@ import sys
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
-   # if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
-   #     try:
-   #         del (conn.chans[conn.dataN['chan']]) 
-   #     except Exception,e:
-   #         print "Failed to remove; %s" % (str(e)) 
+    if conn.dataN['msg'] == "\001VERSION\001":
+        conn.sendNotice('VERSION Twatbot, the tweeting bot 1.2',conn.dataN['fool'])
+    if conn.dataN['msg'] == "\001PING\001":
+        conn.sendNotice('PONG',conn.dataN['fool'])
+    if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
+        try:
+            del (conn.chans[conn.dataN['chan']]) 
+        except Exception,e:
+            print "Failed to remove; %s" % (str(e)) 
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
         if conn.dataN['words'][0] == '^cmds':
            trigs = []
@@ -59,7 +64,8 @@ pluginList = [
     plugins.scroll,
     plugins.tweet,
     plugins.checkem,
-    plugins.markov
+    plugins.markov,
+    plugins.laughter
 ]
 adminPlugins = [
     plugins.joinpart,

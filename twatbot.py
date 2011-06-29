@@ -6,7 +6,7 @@ import twitter
 import time
 import plugins.markov
 from collections import deque
-
+import cPickle as pickle
 import parser
 
 def getFile(x):
@@ -36,6 +36,8 @@ class Connection:
     and related information"""
     def __init__(self):
         self.api = api
+        self.lpkl = open('laughter.pkl','r+')
+        self.laughter = pickle.load(self.lpkl)
         self.admins = ['Jonno_FTW','Garfunkel']
         self.chans = {'#perwl':None,'#futaba':None,"#check'em":None,'#/g/tv':None}
         self.playing = False
@@ -51,10 +53,13 @@ class Connection:
             print('Send timeout')
         else:
             print (tosend[:-2])
-
+            
+    def sendNotice(self,msg,fool):
+        self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
+        
     def sendMsg(self,msg,chan):
         self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
-
+ 
     def connect(self):
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         self.irc.settimeout(300)
@@ -101,13 +106,23 @@ class Connection:
         self.markov = obj
 
 def line(data):
+    verbose = open('verbose.log','a')
+    verbose.write(data)
+    verbose.close()
     data = data.rstrip('\r\n')
-    msg  = ''.join(data.split(':',2)[2:])
-    words= msg.split()
-    data = data.split()
+    try:
+        p    = data[data.find('@'):].split()
+        msg  = ' '.join(p[3:])[1:]
+        cmd  = p[1]
+        chan = p[2]
+        data = data.split()
+    except: #horrible
+        msg  = ''.join(data.split(':',2)[2:])
+        data = data.split()
+        cmd  = data[1]
+        chan = data[2]
     fool = data[0].split('!')[0][1:]
-    cmd  = data[1]
-    chan = data[2]
+    words= msg.split()
     dic = {
         'fool':fool,
         'msg':msg,
@@ -132,12 +147,19 @@ while True:
         continue
     conn.dataN = line(dataN)
     parser.parse(conn)
-    if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys():
+    if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys() or conn.dataN['chan'] == nick:
         try:
             if conn.dataN['words'][0][0] != '^':
                 if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
                     conn.log.write(conn.dataN['msg']+'\n')
-                conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
+                if random.randint(1,100)== 20:
+                   try:
+                       conn.laughter[conn.dataN['fool']]+=1
+                   except KeyError, e:
+                       conn.laughter[conn.dataN['fool']]=1
+                   pickle.dump(conn.laughter,conn.lpkl)
+                   conn.sendMsg("\001ACTION studio laughter\001",conn.dataN['chan'])
+                if conn.dataN['chan'] != nick: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
             pass
 
