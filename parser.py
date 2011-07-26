@@ -11,6 +11,7 @@ import plugins.checkem
 import plugins.markov
 import plugins.markovgenpy
 import plugins.laughter
+import plugins.fullwidth
 from heapq import merge
 import traceback
 import sys
@@ -65,7 +66,8 @@ pluginList = [
     plugins.tweet,
     plugins.checkem,
     plugins.markov,
-    plugins.laughter
+    plugins.laughter,
+    plugins.fullwidth
 ]
 adminPlugins = [
     plugins.joinpart,

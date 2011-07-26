@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2.7
 import socket
 import sys
 import random
@@ -36,8 +36,12 @@ class Connection:
     and related information"""
     def __init__(self):
         self.api = api
-        self.lpkl = open('laughter.pkl','r+')
-        self.laughter = pickle.load(self.lpkl)
+#        self.lpkl = open('laughter.pkl','r')
+#        self.laughter = pickle.load(self.lpkl)
+#        self.lpkl.close()
+#        self.laughter[None] = 0
+#        self.lpkl = open('laughter.pkl','w')
+#        pickle.dump(self.laughter,self.lpkl)
         self.admins = ['Jonno_FTW','Garfunkel']
         self.chans = {'#perwl':None,'#futaba':None,"#check'em":None,'#/g/tv':None}
         self.playing = False
@@ -152,12 +156,12 @@ while True:
             if conn.dataN['words'][0][0] != '^':
                 if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
                     conn.log.write(conn.dataN['msg']+'\n')
-                if random.randint(1,100)== 20:
-                   try:
-                       conn.laughter[conn.dataN['fool']]+=1
-                   except KeyError, e:
-                       conn.laughter[conn.dataN['fool']]=1
-                   pickle.dump(conn.laughter,conn.lpkl)
+                if random.randint(1,100)== 20 and conn.dataN['chan'] != '#/g/tv':
+               #    try:
+               #        conn.laughter[conn.dataN['fool']]+=1
+               #    except KeyError, e:
+               #        conn.laughter[conn.dataN['fool']]=1
+               #    pickle.dump(conn.laughter,conn.lpkl)
                    conn.sendMsg("\001ACTION studio laughter\001",conn.dataN['chan'])
                 if conn.dataN['chan'] != nick: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
