@@ -46,6 +46,7 @@ class Connection:
         self.chans = {'#perwl':None,'#futaba':None,"#check'em":None,'#/g/tv':None}
         self.playing = False
         self.banned = getFile('banned')
+        self.ignores = getFile('ignore')
         self.irc = self.connect()
 	self.nick = nick
 	self.log = open('text.log','a+')
@@ -61,7 +62,8 @@ class Connection:
     def sendNotice(self,msg,fool):
         self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
         
-    def sendMsg(self,msg,chan):
+    def sendMsg(self,msg,chan = None):
+        if chan == None: chan = self.dataN['chan']
         self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
  
     def connect(self):

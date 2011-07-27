@@ -1,4 +1,5 @@
 #Twatbot Plugins
+import plugins.amigo
 import plugins.dragon
 import plugins.ban
 import plugins.help
@@ -43,7 +44,7 @@ def parse(conn):
 
 def check(pl,conn):
     for plugin in pl:
-        if conn.dataN['words'][0] in plugin.triggers:
+        if conn.dataN['fool'] not in (conn.ignores+conn.banned) and conn.dataN['words'][0] in plugin.triggers:
             if conn.dataN['msg'].find('help') != -1:
                 try:
                     conn.sendMsg(plugin.help,conn.dataN['chan'])
@@ -58,6 +59,7 @@ def check(pl,conn):
                     conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
 
 pluginList = [
+    plugins.amigo,
     plugins.ban,
     plugins.chans,
     plugins.dragon,
