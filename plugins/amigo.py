@@ -6,7 +6,7 @@ import time
 help = "Copies the functionality of amigo"
 
 def uid(conn):
-   conn.sendMsg(uuid.uuid1())
+   conn.sendMsg(str(uuid.uuid1()).upper())
 def fortune(conn):
     for i in check_output(["fortune","-s"]).split('\n'):
         conn.sendMsg(i)
