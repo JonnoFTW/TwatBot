@@ -165,7 +165,7 @@ while True:
                #        conn.laughter[conn.dataN['fool']]=1
                #    pickle.dump(conn.laughter,conn.lpkl)
                    conn.sendMsg("\001ACTION studio laughter\001",conn.dataN['chan'])
-                if conn.dataN['chan'] != nick: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
+                if conn.dataN['chan'] != nick and conn.dataN['fool'] not in conn.ignores: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
             pass
 
