@@ -2,6 +2,7 @@ import socket
 import uuid 
 from subprocess import check_output
 import random 
+from datetime import datetime
 import time
 help = "Copies the functionality of amigo"
 
@@ -31,7 +32,9 @@ def ti(conn):
     conn.sendMsg(time.strftime("%a %b %d %H:%M:%S %Z %Y",time.localtime()))
     
 def sdate(conn):
-    conn.sendMsg('eternal summers time',time.localtime())
+    then = datetime(1993,8,31,0,0,0)
+    now = datetime.now()
+    conn.sendMsg(time.strftime('%a Sep '+str((now-then).days)+' %H:%M:%S %Z 1993',time.localtime()))
 def roulette(conn):
     conn.sendMsg('\001ACTION Loads a single round into the revolver and places it to '+conn.dataN['fool']+'\'s head\001')
     if random.randint(1,6) == 6:

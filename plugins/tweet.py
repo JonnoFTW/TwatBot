@@ -6,6 +6,7 @@ def tweet(conn):
         if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":
             if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split(':')[0]:
                 conn.sendMsg("Can't quote yourself"+( '!'*(random.randint(0,2))),conn.dataN['chan'])
+                return
             if any(map(lambda x: x.lower() in badwords,conn.dataN['words'])):
                 conn.sendMsg('Naughty words not allowed')
                 return

@@ -43,7 +43,7 @@ class Connection:
 #        self.lpkl = open('laughter.pkl','w')
 #        pickle.dump(self.laughter,self.lpkl)
         self.admins = ['Jonno_FTW','Garfunkel']
-        self.chans = {'#perwl':None,'#futaba':None,"#check'em":None,'#/g/tv':None}
+        self.chans = {'#perwl':None,'#futaba':None}
         self.playing = False
         self.banned = getFile('banned')
         self.ignores = getFile('ignore')
