@@ -34,7 +34,7 @@ def parse(conn):
            trigs = []
            for i in list(merge(pluginList, adminPlugins)):
                trigs.append(i.triggers.keys())
-           conn.sendMsg(str(trigs),conn.dataN['chan'])
+           conn.sendMsg(str(trigs))
            return
         # Run the function for the given command
         if conn.dataN['fool'] in conn.admins:
