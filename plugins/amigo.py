@@ -48,11 +48,18 @@ def dig(conn):
        socket.inet_aton(conn.dataN['words'][1])
        ip = "-x"
      except socket.error:
-       ip = ""
+       ip = " "
      ass = check_output(["dig",ip,conn.dataN['words'][1],"+short"]).split('\n')
      conn.sendMsg(', '.join(ass)[:-2])
    except IndexError,e :
      conn.sendMsg("Please provide a domain to search for")
+def trendy(conn):
+    # Be sure to have a trendy file ready
+    trends = []
+    for line in open('plugins/trendy'):
+       trends.append(line[:-1])
+    l = len(trends)
+    conn.sendMsg(' '.join([trends[random.randint(1,l)],trends[random.randint(1,l)],trends[random.randint(1,l)]]))
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -60,5 +67,6 @@ triggers = { '^fortune':fortune,
              '^uuid':uid,
              '^sdate':sdate,
              '^roulette':roulette,
+             '^trendy':trendy,
              '^dig':dig }
     

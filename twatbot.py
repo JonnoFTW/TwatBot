@@ -123,10 +123,13 @@ def line(data):
         chan = p[2]
         data = data.split()
     except: #horrible
-        msg  = ''.join(data.split(':',2)[2:])
-        data = data.split()
-        cmd  = data[1]
-        chan = data[2]
+        try:
+          msg  = ''.join(data.split(':',2)[2:])
+          data = data.split()
+          cmd  = data[1]
+          chan = data[2]
+        except:
+          return False
     fool = data[0].split('!')[0][1:]
     words= msg.split()
     dic = {
@@ -152,6 +155,7 @@ while True:
         conn = Connection()
         continue
     conn.dataN = line(dataN)
+    if not conn.dataN: continue
     parser.parse(conn)
     if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys() or conn.dataN['chan'] == nick:
         try:
