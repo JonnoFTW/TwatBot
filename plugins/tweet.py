@@ -12,11 +12,12 @@ def tweet(conn):
                 return
             else:
                 if len(conn.dataN['words']) > 1:
-#		   if conn.chans[conn.dataN['words']][int(conn.dataN['words'][1])] = 
                    toSend = conn.chans[conn.dataN['chan']][int(conn.dataN['words'][1])]
 		else:
                     toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
                 print(toSend)
+                if toSend.find("\001ACTION") != -1:
+                    toSend = '*** '+(toSend.replace(': \001ACTION','',1)[:-1])
                 conn.setTwit(toSend,conn.dataN['chan'])
                 spaces = '!'*(random.randint(0,2))  
                 conn.sendMsg('Sending to twitter'+spaces,conn.dataN['chan']) 

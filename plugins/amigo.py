@@ -60,6 +60,8 @@ def trendy(conn):
        trends.append(line[:-1])
     l = len(trends)
     conn.sendMsg(' '.join([trends[random.randint(1,l)],trends[random.randint(1,l)],trends[random.randint(1,l)]]))
+def uptime(conn):
+    conn.sendMsg(str(datetime.now()-conn.uptime))
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -68,5 +70,6 @@ triggers = { '^fortune':fortune,
              '^sdate':sdate,
              '^roulette':roulette,
              '^trendy':trendy,
-             '^dig':dig }
+             '^dig':dig,
+             '^uptime':uptime }
     

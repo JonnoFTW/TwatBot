@@ -6,8 +6,8 @@ import twitter
 import time
 import plugins.markov
 from collections import deque
-import cPickle as pickle
 import parser
+import datetime
 
 def getFile(x):
     f = open(x,'r')
@@ -36,20 +36,15 @@ class Connection:
     and related information"""
     def __init__(self):
         self.api = api
-#        self.lpkl = open('laughter.pkl','r')
-#        self.laughter = pickle.load(self.lpkl)
-#        self.lpkl.close()
-#        self.laughter[None] = 0
-#        self.lpkl = open('laughter.pkl','w')
-#        pickle.dump(self.laughter,self.lpkl)
         self.admins = ['Jonno_FTW','Garfunkel']
         self.chans = {'#perwl':None,'#futaba':None}
         self.playing = False
         self.banned = getFile('banned')
         self.ignores = getFile('ignore')
         self.irc = self.connect()
-	self.nick = nick
-	self.log = open('text.log','a+')
+        self.nick = nick
+        self.log = open('text.log','a+')
+        self.uptime = datetime.datetime.now()
         
     def ircCom(self,command,msg):
         tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
@@ -162,13 +157,6 @@ while True:
             if conn.dataN['words'][0][0] != '^':
                 if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
                     conn.log.write(conn.dataN['msg']+'\n')
-                if random.randint(1,100)== 20 and conn.dataN['chan'] != '#/g/tv':
-               #    try:
-               #        conn.laughter[conn.dataN['fool']]+=1
-               #    except KeyError, e:
-               #        conn.laughter[conn.dataN['fool']]=1
-               #    pickle.dump(conn.laughter,conn.lpkl)
-                   conn.sendMsg("\001ACTION studio laughter\001",conn.dataN['chan'])
                 if conn.dataN['chan'] != nick and conn.dataN['fool'] not in conn.ignores: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
             pass
