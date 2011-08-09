@@ -60,6 +60,8 @@ class Connection:
     def sendMsg(self,msg,chan = None):
         if chan == None: chan = self.dataN['chan']
         self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
+    def sendNot(self,msg):
+        self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
  
     def connect(self):
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )

@@ -34,7 +34,7 @@ def parse(conn):
            trigs = []
            for i in list(merge(pluginList, adminPlugins)):
                trigs.append(i.triggers.keys())
-           conn.sendMsg(str(trigs))
+           conn.sendNot(str(trigs))
            return
         # Run the function for the given command
         if conn.dataN['fool'] in conn.admins:
@@ -47,10 +47,10 @@ def check(pl,conn):
         if conn.dataN['fool'] not in (conn.ignores+conn.banned) and conn.dataN['words'][0] in plugin.triggers:
             if conn.dataN['msg'].find('help') != -1:
                 try:
-                    conn.sendMsg(plugin.help,conn.dataN['chan'])
+                    conn.sendNot(plugin.help,conn.dataN['chan'])
                     return
                 except: 
-                    conn.sendMsg("No help available",conn.dataN['chan'])
+                    conn.sendNot("No help available",conn.dataN['chan'])
 		    return
             else:            
                 try:
