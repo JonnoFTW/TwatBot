@@ -47,10 +47,10 @@ def check(pl,conn):
         if conn.dataN['fool'] not in (conn.ignores+conn.banned) and conn.dataN['words'][0] in plugin.triggers:
             if conn.dataN['msg'].find('help') != -1:
                 try:
-                    conn.sendNot(plugin.help,conn.dataN['chan'])
+                    conn.sendNot(plugin.help)
                     return
                 except: 
-                    conn.sendNot("No help available",conn.dataN['chan'])
+                    conn.sendNot("No help available")
 		    return
             else:            
                 try:

@@ -8,6 +8,8 @@ import plugins.markov
 from collections import deque
 import parser
 import datetime
+import SocketServer
+from threading import Thread
 
 def getFile(x):
     f = open(x,'r')
@@ -31,6 +33,27 @@ network = 'irc.rizon.net'
 port = 6667
 nick = 'TwatBot'
 
+class GitHandler(SocketServer.StreamRequestHandler):
+    def handle(self):
+      try:
+        if self.client_address[0] != '127.0.0.1':
+            return
+        self.data = self.request.recv(1024).strip().replace('\n','')
+        conn.sendMsg(self.data,"#perwl")    
+      except Exception, e:
+        print str(e)
+class GitServ(Thread)        :
+   def __init__(self):
+     try:
+        Thread.__init__(self)
+        self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
+     except Exception, e:
+        print str(e)
+   def run(self):
+        self.server.serve_forever()
+   def stop(self):
+        self.server.shutdown()
+
 class Connection:
     """A class to hold the connection to the server
     and related information"""
@@ -45,9 +68,11 @@ class Connection:
         self.nick = nick
         self.log = open('text.log','a+')
         self.uptime = datetime.datetime.now()
+        self.srvthread = GitServ()
+        self.srvthread.start()
         
     def ircCom(self,command,msg):
-        tosend = (command +' ' + msg + '\r\n').encode('utf-8','replace')
+        tosend = (command +' ' + msg.replace('\n',"") + '\r\n').encode('utf-8','replace')
         result = self.irc.send (tosend)
         if result == 0:
             print('Send timeout')
@@ -79,6 +104,7 @@ class Connection:
         self.ircCom (op,chan)
     def decon(self):
         self.irc.shutdown(1)
+        self.srvthread.stop()        
         self.irc.close()
     def close(self):
         self.ircCom('QUIT',":I don't quit, I wait")
@@ -107,6 +133,7 @@ class Connection:
             self.sendMsg( 'Could not update twitter',chan)
     def setMarkov(self,obj):
         self.markov = obj
+
 
 def line(data):
     verbose = open('verbose.log','a')
