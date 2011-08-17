@@ -57,6 +57,7 @@ def check(pl,conn):
                     plugin.triggers[conn.dataN['words'][0]](conn)
                     return
                 except Exception, err:
+                    print >> sys.stderr, str(err)
                     conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
 
 pluginList = [

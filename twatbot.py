@@ -41,18 +41,19 @@ class GitHandler(SocketServer.StreamRequestHandler):
         self.data = self.request.recv(1024).strip().replace('\n','')
         conn.sendMsg(self.data,"#perwl")    
       except Exception, e:
-        print str(e)
+        print >> sys.stderr, str(e)
 class GitServ(Thread)        :
    def __init__(self):
      try:
         Thread.__init__(self)
         self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
      except Exception, e:
-        print str(e)
+        print >> sys.stderr, str(e)
    def run(self):
         self.server.serve_forever()
    def stop(self):
         self.server.shutdown()
+        self.server.close()
 
 class Connection:
     """A class to hold the connection to the server
@@ -174,7 +175,8 @@ while True:
         if dataN.split()[0] == 'PING':
             conn.ircCom('PONG', dataN.split()[1][1:])
             continue
-    except :
+    except Exception, e:
+        print >> sys.stderr, str(e)
         conn.decon()
         conn = Connection()
         continue
