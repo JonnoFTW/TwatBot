@@ -10,7 +10,7 @@ def uid(conn):
    conn.sendMsg(str(uuid.uuid1()).upper())
 def fortune(conn):
     for i in check_output(["fortune","-s"]).split('\n'):
-        conn.sendMsg(i)
+        conn.sendMsg(i.replace("\x03",""))
 def uname(conn):
     conn.sendMsg(check_output(["uname","-a"]))
 def w(conn):

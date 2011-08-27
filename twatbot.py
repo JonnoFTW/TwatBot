@@ -42,18 +42,19 @@ class GitHandler(SocketServer.StreamRequestHandler):
         conn.sendMsg(self.data,"#perwl")    
       except Exception, e:
         print >> sys.stderr, str(e)
-class GitServ(Thread)        :
+class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
    def __init__(self):
      try:
-        Thread.__init__(self)
         self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
+        #self.server.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
+        Thread.__init__(self)
      except Exception, e:
         print >> sys.stderr, str(e)
    def run(self):
         self.server.serve_forever()
    def stop(self):
         self.server.shutdown()
-        self.server.close()
+        #self.server.close()
 
 class Connection:
     """A class to hold the connection to the server
@@ -105,7 +106,6 @@ class Connection:
         self.ircCom (op,chan)
     def decon(self):
         self.irc.shutdown(1)
-        self.srvthread.stop()        
         self.irc.close()
     def close(self):
         self.ircCom('QUIT',":I don't quit, I wait")
@@ -113,6 +113,7 @@ class Connection:
         print ('Exiting')
         self.decon()
         self.log.close()
+        self.srvthread.stop()        
         sys.exit(1)
 
     def joinChan(self,chan):

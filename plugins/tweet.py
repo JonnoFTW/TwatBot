@@ -4,7 +4,7 @@ badwords = ["jihad","anal","nigger","fuck","global-jihad", "beatdownbrigade", "4
 def tweet(conn):
     if conn.dataN['fool'] not in conn.banned and conn.dataN['chan'] not in conn.ignores:
         if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":
-            if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split(':')[0]:
+            if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][-1].split(':')[0]:
                 conn.sendMsg("Can't quote yourself"+( '!'*(random.randint(0,2))),conn.dataN['chan'])
                 return
             if any(map(lambda x: x.lower() in badwords,conn.dataN['words'])):
