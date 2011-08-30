@@ -1,4 +1,5 @@
 #Twatbot Plugins
+#import plugins.tell
 import plugins.amigo
 import plugins.dragon
 import plugins.ban
@@ -66,6 +67,7 @@ pluginList = [
     plugins.chans,
     plugins.dragon,
     plugins.help,
+ #   plugins.tell,
     plugins.scroll,
     plugins.tweet,
     plugins.checkem,

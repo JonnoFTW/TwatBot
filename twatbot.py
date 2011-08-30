@@ -91,9 +91,15 @@ class Connection:
         self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
  
     def connect(self):
+     while True:
+      try:
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         self.irc.settimeout(300)
         self.irc.connect ((network,port))
+      except:
+        time.sleep(10)
+        continue
+      finally:
         self.ircCom ('NICK',nick)
         self.ircCom ('USER',nick+ ' x * :Segwinton Buttsworthy')
         self.sendMsg('identify '+keys[4],'nickserv')
@@ -176,6 +182,8 @@ while True:
         if dataN.split()[0] == 'PING':
             conn.ircCom('PONG', dataN.split()[1][1:])
             continue
+    except KeyboardIntterupt:
+        conn.close()
     except Exception, e:
         print >> sys.stderr, str(e)
         conn.decon()
