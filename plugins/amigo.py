@@ -67,9 +67,9 @@ def hipster(conn):
    hip = []
    for line in open('plugins/hipster'):
       hip.append(line[:-1])
-   l = len(trends)
+   l = len(hip)
    out = []
-   for i in xranage(random.randint(1,4)):
+   for i in xrange(random.randint(1,4)):
       out.append(hip[random.randint(0,l)])
    conn.sendMsg(' '.join(out))
    
