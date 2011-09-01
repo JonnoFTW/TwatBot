@@ -69,7 +69,7 @@ def hipster(conn):
       hip.append(line[:-1])
    l = len(hip)-1
    out = []
-   for i in xrange(random.randint(1,4)):
+   while(len( (' '.join(out).split())) < 5):
       out.append(hip[random.randint(0,l)])
    conn.sendMsg(' '.join(out))
    
