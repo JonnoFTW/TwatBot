@@ -58,7 +58,7 @@ def trendy(conn):
     trends = []
     for line in open('plugins/trendy'):
        trends.append(line[:-1])
-    l = len(trends)
+    l = len(trends)-1
     conn.sendMsg(' '.join([trends[random.randint(0,l)],trends[random.randint(0,l)],trends[random.randint(0,l)]]))
 def uptime(conn):
     conn.sendMsg(str(datetime.now()-conn.uptime))
@@ -67,7 +67,7 @@ def hipster(conn):
    hip = []
    for line in open('plugins/hipster'):
       hip.append(line[:-1])
-   l = len(hip)
+   l = len(hip)-1
    out = []
    for i in xrange(random.randint(1,4)):
       out.append(hip[random.randint(0,l)])
