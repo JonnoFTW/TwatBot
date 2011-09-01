@@ -65,7 +65,7 @@ def uptime(conn):
 
 def hipster(conn):
    hip = []
-   for line in open('plugin/hipster'):
+   for line in open('plugins/hipster'):
       hip.append(line[:-1])
    l = len(trends)
    out = []
