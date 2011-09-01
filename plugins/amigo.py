@@ -59,9 +59,20 @@ def trendy(conn):
     for line in open('plugins/trendy'):
        trends.append(line[:-1])
     l = len(trends)
-    conn.sendMsg(' '.join([trends[random.randint(1,l)],trends[random.randint(1,l)],trends[random.randint(1,l)]]))
+    conn.sendMsg(' '.join([trends[random.randint(0,l)],trends[random.randint(0,l)],trends[random.randint(0,l)]]))
 def uptime(conn):
     conn.sendMsg(str(datetime.now()-conn.uptime))
+
+def hipster(conn):
+   hip = []
+   for line in open('plugin/hipster'):
+      hip.append(line[:-1])
+   l = len(trends)
+   out = []
+   for i in xranage(random.randint(1,4)):
+      out.append(hip[random.randint(0,l)])
+   conn.sendMsg(' '.join(out))
+   
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -71,5 +82,6 @@ triggers = { '^fortune':fortune,
              '^roulette':roulette,
              '^trendy':trendy,
              '^dig':dig,
-             '^uptime':uptime }
+             '^uptime':uptime,
+             '^hipster':hipster}
     
