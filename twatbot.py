@@ -70,16 +70,23 @@ class Connection:
         self.nick = nick
         self.log = open('text.log','a+')
         self.uptime = datetime.datetime.now()
-        self.srvthread = GitServ()
-        self.srvthread.start()
+#        self.srvthread = GitServ()
+#        self.srvthread.start()
         
     def ircCom(self,command,msg):
+      try:
         tosend = (command +' ' + msg.replace('\n',"") + '\r\n').encode('utf-8','replace')
         result = self.irc.send (tosend)
         if result == 0:
             print('Send timeout')
         else:
             print (tosend[:-2])
+      except:
+        self.errs+= 1
+        if (self.errs >=  3):
+          self.decon()
+          self.connect()
+        print "Sending error"
             
     def sendNotice(self,msg,fool):
         self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
@@ -91,6 +98,7 @@ class Connection:
         self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
  
     def connect(self):
+     self.errs = 0
      while True:
       try:
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
@@ -111,15 +119,18 @@ class Connection:
     def chanOP(self,chan,op):
         self.ircCom (op,chan)
     def decon(self):
+      try:
         self.irc.shutdown(1)
         self.irc.close()
+      except Exception, e:
+        print str(e)
     def close(self):
         self.ircCom('QUIT',":I don't quit, I wait")
         time.sleep(2)
         print ('Exiting')
         self.decon()
         self.log.close()
-        self.srvthread.stop()        
+ #       self.srvthread.stop()        
         sys.exit(1)
 
     def joinChan(self,chan):
@@ -182,7 +193,7 @@ while True:
         if dataN.split()[0] == 'PING':
             conn.ircCom('PONG', dataN.split()[1][1:])
             continue
-    except KeyboardIntterupt:
+    except KeyboardInterrupt:
         conn.close()
     except Exception, e:
         print >> sys.stderr, str(e)

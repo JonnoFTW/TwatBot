@@ -12,7 +12,7 @@ def scroll(conn):
         for i in list(conn.chans[conn.dataN['chan']]):
             tosend+= str(count)+': '+i.decode('utf-8','replace')+' | '
             count +=1
-        conn.sendMsg(tosend)
+        conn.sendNot(tosend)
 triggers = {'^scroll':scroll}
 
 
