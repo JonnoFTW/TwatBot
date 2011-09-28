@@ -22,9 +22,9 @@ def tweet(conn):
                 print(toSend)
                 if toSend.find("\001ACTION") != -1:
                     toSend = '*** '+(toSend.replace(': \001ACTION','',1)[:-1])
-                conn.setTwit(toSend,conn.dataN['chan'])
+                r = conn.setTwit(toSend,conn.dataN['chan'])
                 spaces = '!'*(random.randint(0,2))  
-                conn.sendMsg('Sending to twitter'+spaces,conn.dataN['chan']) 
+                if r!= False: conn.sendMsg('Sending to twitter'+spaces) 
 
 def last(conn):
     if len(conn.dataN['words']) > 1:
@@ -33,4 +33,4 @@ def last(conn):
         conn.sendMsg(conn.getTwit('Buttsworth_').replace('/\r\n|\r|\n/g',''),conn.dataN['chan'])
 
 
-triggers = {'^^':tweet,'^last':last}
+triggers = {'^twat':tweet,'^^':tweet,'^last':last}

@@ -81,12 +81,8 @@ class Connection:
             print('Send timeout')
         else:
             print (tosend[:-2])
-      except:
-        self.errs+= 1
-        if (self.errs >=  3):
-          self.decon()
-          self.connect()
-        print "Sending error"
+      except Exception, e :
+        print str(e)
             
     def sendNotice(self,msg,fool):
         self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
@@ -150,6 +146,7 @@ class Connection:
             return result
         except:
             self.sendMsg( 'Could not update twitter',chan)
+            return False
     def setMarkov(self,obj):
         self.markov = obj
 
@@ -200,10 +197,11 @@ while True:
         conn.decon()
         conn = Connection()
         continue
-    conn.dataN = line(dataN)
-    if not conn.dataN: continue
-    parser.parse(conn)
-    if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys() or conn.dataN['chan'] == nick:
+    for i in dataN.splitlines():
+      conn.dataN = line(i)
+      if not conn.dataN: continue
+      parser.parse(conn)
+      if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys() or conn.dataN['chan'] == nick:
         try:
             if conn.dataN['words'][0][0] != '^':
                 if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
