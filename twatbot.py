@@ -70,8 +70,8 @@ class Connection:
         self.nick = nick
         self.log = open('text.log','a+')
         self.uptime = datetime.datetime.now()
-#        self.srvthread = GitServ()
-#        self.srvthread.start()
+        self.srvthread = GitServ()
+        self.srvthread.start()
         
     def ircCom(self,command,msg):
       try:
@@ -126,7 +126,7 @@ class Connection:
         print ('Exiting')
         self.decon()
         self.log.close()
- #       self.srvthread.stop()        
+        self.srvthread.stop()        
         sys.exit(1)
 
     def joinChan(self,chan):
@@ -195,7 +195,7 @@ while True:
     except Exception, e:
         print >> sys.stderr, str(e)
         conn.decon()
-        conn = Connection()
+        conn.irc = conn.connect()
         continue
     for i in dataN.splitlines():
       conn.dataN = line(i)
