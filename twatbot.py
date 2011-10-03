@@ -5,6 +5,7 @@ import random
 import twitter
 import time
 import plugins.markov
+import plugins.tell
 from collections import deque
 import parser
 import datetime
@@ -61,6 +62,16 @@ class Connection:
     and related information"""
     def __init__(self):
         self.api = api
+        db = plugins.tell.getDB()
+        cu = db.cursor()
+        cu.execute("SELECT `to` FROM tell")
+        s = cu.fetchall()
+        self.tells = set()
+        for i in s:
+            self.tells.add(i[0])
+        print self.tells
+        cu.close()
+        db.close()
         self.admins = ['Jonno_FTW','Garfunkel']
         self.chans = {'#perwl':None,'#futaba':None}
         self.playing = False
@@ -89,7 +100,9 @@ class Connection:
         
     def sendMsg(self,msg,chan = None):
         if chan == None: chan = self.dataN['chan']
-        self.ircCom('PRIVMSG '+chan,':'+msg.rstrip('\r\n'))
+        n = len('PRIVMSG '+chan+':')+512
+        for i in [msg[i:i+n] for i in range(0, len(msg), n)]:
+            self.ircCom('PRIVMSG '+chan,':'+i.rstrip('\r\n'))
     def sendNot(self,msg):
         self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
  
@@ -155,29 +168,20 @@ def line(data):
     verbose = open('verbose.log','a')
     verbose.write(data)
     verbose.close()
-    data = data.rstrip('\r\n')
-    try:
-        p    = data[data.find('@'):].split()
-        msg  = ' '.join(p[3:])[1:]
-        cmd  = p[1]
-        chan = p[2]
-        data = data.split()
-    except: #horrible
-        try:
-          msg  = ''.join(data.split(':',2)[2:])
-          data = data.split()
-          cmd  = data[1]
-          chan = data[2]
-        except:
-          return False
+    data = data.rstrip('\r\n').split()
     fool = data[0].split('!')[0][1:]
-    words= msg.split()
+    cmd  = data[1]
+    chan = data[2].replace(':','')
+    try:
+        msg  = ' '.join(data[3:])[1:]
+    except:
+        msg = None
     dic = {
         'fool':fool,
         'msg':msg,
         'cmd':cmd,
         'chan':chan,
-        'words':words,
+        'words':msg.split(),
         'raw':data
         }
     return dic
@@ -198,6 +202,7 @@ while True:
         conn.irc = conn.connect()
         continue
     for i in dataN.splitlines():
+#      print i
       conn.dataN = line(i)
       if not conn.dataN: continue
       parser.parse(conn)

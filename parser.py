@@ -1,5 +1,5 @@
 #Twatbot Plugins
-#import plugins.tell
+import plugins.tell
 import plugins.amigo
 import plugins.dragon
 import plugins.ban
@@ -25,11 +25,16 @@ def parse(conn):
         conn.sendNotice('VERSION Twatbot, the tweeting bot 1.2',conn.dataN['fool'])
     if conn.dataN['msg'] == "\001PING\001":
         conn.sendNotice('PONG',conn.dataN['fool'])
+    if conn.dataN['fool'] in conn.tells:
+        conn.sendNot(conn.dataN['fool']+": You have unread messages! Type ^read to read them")
+        conn.tells.remove(conn.dataN['fool'])
     if conn.dataN['cmd'] == 'KICK' and conn.nick in conn.dataN['raw']:
         try:
             del (conn.chans[conn.dataN['chan']]) 
         except Exception,e:
             print "Failed to remove; %s" % (str(e)) 
+    if conn.dataN['cmd'] == 'JOIN' and len(conn.dataN['fool']) > 15:
+        conn.sendMsg('.k '+conn.dataN['fool']+'We have a strict no long nick (15 chars) policy here')
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
         if conn.dataN['words'][0] == '^cmds':
            trigs = []
@@ -67,7 +72,7 @@ pluginList = [
     plugins.chans,
     plugins.dragon,
     plugins.help,
- #   plugins.tell,
+    plugins.tell,
     plugins.scroll,
     plugins.tweet,
     plugins.checkem,
