@@ -1,6 +1,17 @@
 #!/usr/bin/python2.7
 import socket
+import os
 import sys
+
+pid = str(os.getpid())
+pidfile = "/tmp/twatbot.pid"
+
+if os.path.isfile(pidfile):
+    print "%s already exists, exiting" % pidfile
+    sys.exit()
+else:
+    file(pidfile, 'w').write(pid)
+
 import random
 import twitter
 import time
@@ -39,8 +50,15 @@ class GitHandler(SocketServer.StreamRequestHandler):
       try:
         if self.client_address[0] != '127.0.0.1':
             return
-        self.data = self.request.recv(1024).strip().replace('\n','')
-        conn.sendMsg(self.data,"#perwl")    
+        data = self.request.recv(1024).strip().replace('\n','')
+        words = data.split()
+        if(words[0][0] == '#'):
+          try:
+            conn.sendMsg(' '.join(words[1:]),words[0])
+          except:
+            pass
+        else:
+            conn.sendMsg(data,"#perwl")    
       except Exception, e:
         print >> sys.stderr, str(e)
 class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
@@ -140,7 +158,6 @@ class Connection:
         self.decon()
         self.log.close()
         self.srvthread.stop()        
-        sys.exit(1)
 
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -168,21 +185,24 @@ def line(data):
     verbose = open('verbose.log','a')
     verbose.write(data)
     verbose.close()
-    data = data.rstrip('\r\n').split()
-    fool = data[0].split('!')[0][1:]
-    cmd  = data[1]
-    chan = data[2].replace(':','')
+    raw = data
     try:
+        data = data.rstrip('\r\n').split()
+        fool = data[0].split('!')[0][1:]
+        cmd  = data[1]
+        chan = data[2].replace(':','')
         msg  = ' '.join(data[3:])[1:]
-    except:
-        msg = None
+    except Exception, e:
+        print  ("An error occurred when parsing: "+raw)
+        print >> sys.stderr, str(e)
+        return None
     dic = {
         'fool':fool,
         'msg':msg,
         'cmd':cmd,
         'chan':chan,
         'words':msg.split(),
-        'raw':data
+        'raw':raw
         }
     return dic
     
@@ -196,6 +216,7 @@ while True:
             continue
     except KeyboardInterrupt:
         conn.close()
+        break
     except Exception, e:
         print >> sys.stderr, str(e)
         conn.decon()
@@ -215,4 +236,4 @@ while True:
         except IndexError:
             pass
 
-
+os.unlink(pidfile)
