@@ -1,4 +1,5 @@
 #Twatbot Plugins
+import plugins.urban
 import plugins.tell
 import plugins.amigo
 import plugins.dragon
@@ -67,6 +68,7 @@ def check(pl,conn):
                     conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
 
 pluginList = [
+    plugins.urban,
     plugins.amigo,
     plugins.ban,
     plugins.chans,

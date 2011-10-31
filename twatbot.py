@@ -3,12 +3,20 @@ import socket
 import os
 import sys
 
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
 pid = str(os.getpid())
 pidfile = "/tmp/twatbot.pid"
 
 if os.path.isfile(pidfile):
-    print "%s already exists, exiting" % pidfile
-    sys.exit()
+    try:
+        os.kill(int(file(pidfile).read()), 0)
+        print "%s already exists, exiting" % pidfile
+        sys.exit()
+    except OSError:
+        pass
 else:
     file(pidfile, 'w').write(pid)
 
@@ -231,7 +239,10 @@ while True:
         try:
             if conn.dataN['words'][0][0] != '^':
                 if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
+                  try:
                     conn.log.write(conn.dataN['msg']+'\n')
+                  except Exception, e:
+                    print e
                 if conn.dataN['chan'] != nick and conn.dataN['fool'] not in conn.ignores: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
         except IndexError:
             pass
