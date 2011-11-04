@@ -1,4 +1,5 @@
 #Twatbot Plugins
+import plugins.google
 import plugins.urban
 import plugins.tell
 import plugins.amigo
@@ -34,8 +35,8 @@ def parse(conn):
             del (conn.chans[conn.dataN['chan']]) 
         except Exception,e:
             print "Failed to remove; %s" % (str(e)) 
-    if conn.dataN['cmd'] == 'JOIN' and len(conn.dataN['fool']) > 15:
-        conn.sendMsg(conn.dataN['fool']+': We have a strict no long nick (15 chars) policy here')
+#    if conn.dataN['cmd'] == 'JOIN' and len(conn.dataN['fool']) > 15:
+#        conn.sendMsg(".k "+conn.dataN['fool']+' We have a strict no long nick (15 chars) policy here')
     if conn.dataN['cmd'] == 'PRIVMSG' and len(conn.dataN['words']) != 0:
         if conn.dataN['words'][0] == '^cmds':
            trigs = []
@@ -79,6 +80,7 @@ pluginList = [
     plugins.tweet,
     plugins.checkem,
     plugins.markov,
+    plugins.google,
 #    plugins.laughter,
     plugins.fullwidth
 ]

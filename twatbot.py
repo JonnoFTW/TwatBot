@@ -166,7 +166,10 @@ class Connection:
         self.decon()
         self.log.close()
         self.srvthread.stop()        
-
+        time.sleep(2)
+        os.unlink(pidfile)
+        sys.exit(0)
+        
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
