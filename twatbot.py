@@ -2,6 +2,7 @@
 import socket
 import os
 import sys
+import gc
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -220,6 +221,7 @@ def line(data):
 conn = Connection()
 
 while True:
+    gc.collect()
     try:
         dataN = conn.irc.recv(4096)# .decode('utf-8','ignore')
         if dataN.split()[0] == 'PING':

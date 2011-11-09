@@ -1,3 +1,4 @@
+import re
 import socket
 import uuid 
 from subprocess import check_output
@@ -48,6 +49,9 @@ def dig(conn):
        socket.inet_aton(conn.dataN['words'][1])
        ip = "-x"
      except socket.error:
+       if not re.match(r'[a-zA-Z\d-]{,63}(\.[a-zA-Z\d-]{,63})*',words[1]):
+           conn.sendMsg('Please enter a valid domain name')
+           return
        ip = " "
      ass = check_output(["dig",ip,conn.dataN['words'][1],"+short"]).split('\n')
      conn.sendMsg(', '.join(ass)[:-2])
