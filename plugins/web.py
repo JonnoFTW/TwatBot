@@ -60,5 +60,8 @@ def weather(conn):
         conn.sendMsg(out)
     except IndexError, e:
         conn.sendMsg("Usage is ^weather <State> <Location>")
+def fml(conn):
+    page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random"))
+    conn.sendMsg(page.find('div',{"class":"post article"}).p.text)
 
-triggers = {'^ud':urban,'^g':search, '^google':search,"^weather":weather,"^w":weather}
+triggers = {'^ud':urban,'^g':search, '^google':search,"^weather":weather,'^fml':fml}
