@@ -1,7 +1,7 @@
 import re
 import socket
 import uuid 
-from subprocess import check_output
+import subprocess
 import random 
 from datetime import datetime
 import time
@@ -10,12 +10,12 @@ help = "Copies the functionality of amigo"
 def uid(conn):
    conn.sendMsg(str(uuid.uuid1()).upper())
 def fortune(conn):
-    for i in check_output(["fortune","-s"]).split('\n'):
+    for i in subprocess.check_output(["fortune","-s"],shell=True).splitlines():
         conn.sendMsg(i.replace("\x03",""))
 def uname(conn):
-    conn.sendMsg(check_output(["uname","-a"]))
+    conn.sendMsg(subprocess.check_output(["uname","-a"]))
 def w(conn):
-  running = check_output(["w","-hsf"]).split('\n')
+  running = subprocess.check_output(["w","-hsf"]).split('\n')
   users = dict()
   for i in running[:-2]:
     j = i.split()
@@ -53,7 +53,7 @@ def dig(conn):
            conn.sendMsg('Please enter a valid domain name')
            return
        ip = " "
-     ass = check_output(["dig",ip,conn.dataN['words'][1],"+short"]).split('\n')
+     ass = subprocess.check_output(["dig",ip,conn.dataN['words'][1],"+short"]).split('\n')
      conn.sendMsg(', '.join(ass)[:-2])
    except IndexError,e :
      conn.sendMsg("Please provide a domain to search for")
@@ -76,7 +76,16 @@ def hipster(conn):
    while(len( (' '.join(out).split())) < 5):
       out.append(hip[random.randint(0,l)])
    conn.sendMsg(' '.join(out))
-   
+def asl(conn):
+#   conn.sendMsg('new behaviour!')
+   age = random.randint(8,25)
+   if random.randint(0,1) == 1:
+       sex = 'm'
+   else:
+       sex = 'f'
+   places = ['nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
+   loc = places[random.randint(0,len(places)-1)]
+   conn.sendMsg('/'.join([str(age),sex,loc]))
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -87,5 +96,6 @@ triggers = { '^fortune':fortune,
              '^trendy':trendy,
              '^dig':dig,
              '^uptime':uptime,
-             '^hipster':hipster}
+             '^hipster':hipster,
+             'asl':asl}
     

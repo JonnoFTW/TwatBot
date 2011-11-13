@@ -60,6 +60,8 @@ def weather(conn):
         conn.sendMsg(out)
     except IndexError, e:
         conn.sendMsg("Usage is ^weather <State> <Location>")
+    except KeyError, e:
+        conn.sendMsg("No information for this location")
 def fml(conn):
     page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random"))
     conn.sendMsg(page.find('div',{"class":"post article"}).p.text)

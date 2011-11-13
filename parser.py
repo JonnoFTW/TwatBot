@@ -1,20 +1,5 @@
 #Twatbot Plugins
-import plugins.web
-import plugins.tell
-import plugins.amigo
-import plugins.dragon
-import plugins.ban
-import plugins.help
-import plugins.chans
-import plugins.joinpart
-import plugins.tweet
-import plugins.quit
-import plugins.scroll
-import plugins.checkem
-import plugins.markov
-import plugins.markovgenpy
-#import plugins.laughter
-import plugins.fullwidth
+from plugins import *
 from heapq import merge
 import traceback
 import sys
@@ -45,6 +30,21 @@ def parse(conn):
            return
         # Run the function for the given command
         if conn.dataN['fool'] in conn.admins:
+            if conn.dataN['words'][0] == '^reload':
+                try:
+                    g = dict(globals())
+                    for i in g:
+                      print i
+                      try:
+                        if conn.dataN['words'][1] == i:
+                            reload(globals()[conn.dataN['words'][1]])
+                            conn.sendMsg("Module reloaded")
+                      except AttributeError, e:
+                        pass
+                except NameError, e:
+                    conn.sendMsg("NameError")
+                except Exception, e:
+                    conn.sendMsg(str(e))
             check(list(merge(pluginList, adminPlugins)),conn)
         elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
@@ -68,22 +68,23 @@ def check(pl,conn):
                     conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
 
 pluginList = [
-    plugins.web,
-    plugins.amigo,
-    plugins.ban,
-    plugins.chans,
-    plugins.dragon,
-    plugins.help,
-    plugins.tell,
-    plugins.scroll,
-    plugins.tweet,
-    plugins.checkem,
-    plugins.markov,
-#    plugins.laughter,
-    plugins.fullwidth
+    web,
+    stat,
+    amigo,
+    ban,
+    chans,
+    dragon,
+    help,
+    tell,
+    scroll,
+    tweet,
+    checkem,
+    markov,
+#    laughter,
+    fullwidth
 ]
 adminPlugins = [
-    plugins.joinpart,
-    plugins.ban,
-    plugins.quit
+    joinpart,
+    ban,
+    quit
 ]
