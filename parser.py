@@ -34,15 +34,9 @@ def parse(conn):
                 try:
                     g = dict(globals())
                     for i in g:
-                      print i
-                      try:
-                        if conn.dataN['words'][1] == i:
-                            reload(globals()[conn.dataN['words'][1]])
-                            conn.sendMsg("Module reloaded")
-                      except AttributeError, e:
-                        pass
-                except NameError, e:
-                    conn.sendMsg("NameError")
+                      if conn.dataN['words'][1] == i:
+                          reload(globals()[conn.dataN['words'][1]])
+                          conn.sendMsg("Module reloaded")
                 except Exception, e:
                     conn.sendMsg(str(e))
             check(list(merge(pluginList, adminPlugins)),conn)

@@ -78,14 +78,8 @@ def hipster(conn):
    conn.sendMsg(' '.join(out))
 def asl(conn):
 #   conn.sendMsg('new behaviour!')
-   age = random.randint(8,25)
-   if random.randint(0,1) == 1:
-       sex = 'm'
-   else:
-       sex = 'f'
    places = ['nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
-   loc = places[random.randint(0,len(places)-1)]
-   conn.sendMsg('/'.join([str(age),sex,loc]))
+   conn.sendMsg('/'.join([str(random.randint(8,30)),random.choice(['m','f']),random.choice(places)]))
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
