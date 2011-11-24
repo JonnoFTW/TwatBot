@@ -6,7 +6,7 @@ import sys
 
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-    print (conn.dataN['fool']+' '+conn.dataN['chan']+': '+conn.dataN['msg'])
+    print (conn.dataN['fool']+' '+conn.server+'/'+conn.dataN['chan']+': '+conn.dataN['msg'])
     if conn.dataN['msg'] == "\001VERSION\001":
         conn.sendNotice('VERSION Twatbot, the tweeting bot 1.2',conn.dataN['fool'])
     if conn.dataN['msg'] == "\001PING\001":

@@ -30,14 +30,13 @@ from collections import deque
 import parser
 import datetime
 import SocketServer
-from threading import Thread
+from threading import Thread,Lock
 
 def getFile(x):
-    f = open(x,'r')
-    result = f.readlines()
-    f.close()
-    result = map(lambda x: x.rstrip('\n'),result)
-    return result
+    with open(x) as f:
+        result = f.readlines()
+        result = map(lambda x: x.rstrip('\n'),result)
+        return result
 keys = getFile('keys')
 
 api = twitter.Api(
@@ -49,31 +48,35 @@ api = twitter.Api(
 
 print (api.VerifyCredentials())
 
-network = 'irc.rizon.net'
-#network = '65.23.158.132'
-port = 6667
-nick = 'TwatBot'
+servers = [
+ {'server': 'irc.rizon.net',
+  'channels':['#perwl','#futaba']
+  }
+ ]
+
+
 
 class GitHandler(SocketServer.StreamRequestHandler):
     def handle(self):
       try:
-        if self.client_address[0] != '127.0.0.1':
+        if self.client_address[0] not in ['127.0.0.1', '192.168.2.1','192.168.1.133']:
             return
+
         data = self.request.recv(1024).strip().replace('\n','')
         words = data.split()
         if(words[0][0] == '#'):
           try:
-            conn.sendMsg(' '.join(words[1:]),words[0])
+            connections[0].sendMsg(' '.join(words[1:]),words[0])
           except:
             pass
         else:
-            conn.sendMsg(data,"#perwl")    
+            connections[0].sendMsg(data,"#perwl")    
       except Exception, e:
         print >> sys.stderr, str(e)
 class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
    def __init__(self):
      try:
-        self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
+        self.server = SocketServer.TCPServer(("192.168.1.133",6666),GitHandler)
         #self.server.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
         Thread.__init__(self)
      except Exception, e:
@@ -84,11 +87,20 @@ class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
         self.server.shutdown()
         #self.server.close()
 
+
+listener = GitServ()
+listener.start()
+log = open('text.log','a+')
+logLock = Lock()
 class Connection:
     """A class to hold the connection to the server
     and related information"""
-    def __init__(self):
+    def __init__(self,server,channels,port = 6667,nick='TwatBot'):
+        self.server = server
+        self.port = port
+        self.nick = nick
         self.api = api
+        self.srvthread = listener
         db = plugins.tell.getDB()
         cu = db.cursor()
         cu.execute("SELECT `to` FROM tell")
@@ -100,16 +112,14 @@ class Connection:
         cu.close()
         db.close()
         self.admins = ['Jonno_FTW','Garfunkel']
-        self.chans = {'#perwl':None,'#futaba':None}
+        self.chans = dict()
+        for i in channels:
+            self.chans[i] = None
         self.playing = False
         self.banned = getFile('banned')
         self.ignores = getFile('ignore')
         self.irc = self.connect()
-        self.nick = nick
-        self.log = open('text.log','a+')
         self.uptime = datetime.datetime.now()
-        self.srvthread = GitServ()
-        self.srvthread.start()
         
     def ircCom(self,command,msg):
       try:
@@ -139,13 +149,15 @@ class Connection:
       try:
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         self.irc.settimeout(300)
-        self.irc.connect ((network,port))
-      except:
+        print "Connecting to %s:%d" % (self.server,self.port)
+        self.irc.connect ((self.server,self.port))
+      except Exception, e:
+        print str(e)
         time.sleep(10)
         continue
       finally:
-        self.ircCom ('NICK',nick)
-        self.ircCom ('USER',nick+ ' x * :Segwinton Buttsworthy')
+        self.ircCom ('NICK',self.nick)
+        self.ircCom ('USER',self.nick + ' x * :Segwinton Buttsworthy')
         self.sendMsg('identify '+keys[4],'nickserv')
         time.sleep(4)
         for i in self.chans.keys():
@@ -157,19 +169,21 @@ class Connection:
     def decon(self):
       try:
         self.irc.shutdown(1)
-        self.irc.close()
       except Exception, e:
         print str(e)
-    def close(self):
+    def close(self): 
         self.ircCom('QUIT',":I don't quit, I wait")
         time.sleep(2)
         print ('Exiting')
         self.decon()
-        self.log.close()
-        self.srvthread.stop()        
-        time.sleep(2)
-        os.unlink(pidfile)
-        sys.exit(0)
+        try:
+            listener.stop()
+            logLock.acquire()
+            log.close()
+            logLock.release()
+            os.unlink(pidfile)
+        except:
+            pass
         
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -178,25 +192,22 @@ class Connection:
     def getTwit(self,user):
         try:
             result = self.api.GetUserTimeline(user)[0].text
-        except:
-            result = 'Could not get twitter'
+        except Exception, e:
+            result = 'Could not get twitter' + str(e)
         return result
 
     def setTwit(self,msg,chan):
         try:
             result = self.api.PostUpdate(msg)
             return result
-        except:
-            self.sendMsg( 'Could not update twitter',chan)
+        except Exception, e:
+            self.sendMsg( 'Could not update twitter: '+ str(e) )
             return False
     def setMarkov(self,obj):
         self.markov = obj
 
 
 def line(data):
-    verbose = open('verbose.log','a')
-    verbose.write(data)
-    verbose.close()
     raw = data
     try:
         data = data.rstrip('\r\n').split()
@@ -218,38 +229,65 @@ def line(data):
         }
     return dic
     
-conn = Connection()
-
-while True:
-    gc.collect()
-    try:
-        dataN = conn.irc.recv(4096)# .decode('utf-8','ignore')
-        if dataN.split()[0] == 'PING':
-            conn.ircCom('PONG', dataN.split()[1][1:])
-            continue
-    except KeyboardInterrupt:
-        conn.close()
-        break
-    except Exception, e:
-        print >> sys.stderr, str(e)
-        conn.decon()
-        conn.irc = conn.connect()
-        continue
-    for i in dataN.splitlines():
-#      print i
-      conn.dataN = line(i)
-      if not conn.dataN: continue
-      parser.parse(conn)
-      if conn.dataN['cmd'] == 'PRIVMSG' and conn.dataN['chan'] in conn.chans.keys() or conn.dataN['chan'] == nick:
+class ConnectionServer(Thread):
+  def __init__(self,server,channels,port = 6667,nick = 'TwatBot'):
+      Thread.__init__(self)
+      self.m = 1
+      for i in connections:
+        if i.conn.server == server:
+          self.m = 0
+          break
+      if self.m != 0:
+        self.conn = Connection(server,channels,port,nick)
+  def run(self):
+    while True:
+        gc.collect()
         try:
-            if conn.dataN['words'][0][0] != '^':
-                if conn.dataN['msg'].find('http') == -1 and conn.dataN['msg'].count('.') < 8:
+            dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
+            if dataN.split()[0] == 'PING':
+                self.conn.ircCom('PONG', dataN.split()[1][1:])
+                continue
+        except KeyboardInterrupt:
+            self.conn.close()
+            break
+        except Exception, e:
+            print >> sys.stderr, str(e)
+            self.conn.decon()
+            time.sleep(2)
+            self.conn.irc = self.conn.connect()
+            continue
+        for i in dataN.splitlines():
+    #      print i
+          self.conn.dataN = line(i)
+          if not self.conn.dataN: continue
+          parser.parse(self.conn)
+          if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'] in self.conn.chans.keys() or self.conn.dataN['chan'] == self.conn.nick:
+            try:
+                if self.conn.dataN['fool'] in self.conn.admins:
                   try:
-                    conn.log.write(conn.dataN['msg']+'\n')
-                  except Exception, e:
-                    print e
-                if conn.dataN['chan'] != nick and conn.dataN['fool'] not in conn.ignores: conn.chans[conn.dataN['chan']].append(conn.dataN['fool']+': '+conn.dataN['msg'])
-        except IndexError:
-            pass
+                    if self.conn.dataN['words'][0] == '^connect':
+                      connections.append(ConnectionServer(self.conn.dataN['words'][1],[self.conn.dataN['words'][2]],nick='Tw4tb0t'))
+                      if connections[-1].m == 1:
+                        self.conn.sendMsg("Successfully connected")
+                        connections[-1].start()
+                      else:
+                        self.conn.sendMsg("A connection to that server already exists!")
+                  except IndexError,e :
+                    self.conn.sendMsg("Usage is: ^connect server channel")
+                if self.conn.dataN['words'][0][0] != '^':
+                    if self.conn.dataN['msg'].find('http') == -1 and self.conn.dataN['msg'].count('.') < 8:
+                      try:
+                        logLock.acquire()
+                        log.write(self.conn.dataN['msg']+'\n')
+                        logLock.release()
+                      except Exception, e:
+                        print e
+                    if self.conn.dataN['chan'] != self.conn.nick and self.conn.dataN['fool'] not in self.conn.ignores: self.conn.chans[self.conn.dataN['chan']].append(self.conn.dataN['fool']+': '+self.conn.dataN['msg'])
+            except IndexError:
+                pass
+connections = []
+for i in servers:
+    connections.append(ConnectionServer(i['server'],i['channels']))
+for i in connections:
+    i.start()                
 
-os.unlink(pidfile)
