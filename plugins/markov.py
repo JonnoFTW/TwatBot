@@ -26,11 +26,12 @@ def scrape(conn):
 
 def firstrun(conn):
 #    scrape(conn)
-#    f = open('text.log','r')
+    f = open('text.log','r')
     start = time.time()
-    conn.log.seek(0,0)
+#    conn.log.seek(0,0)
 #    trainer = open('/home/jonno/lambdabot/trainer.log','r')
-    conn.setMarkov(markovgenpy.Markov(conn.log))
+    conn.setMarkov(markovgenpy.Markov(f))
+    f.close()
     #conn.setMarkov(pickle.load(open('markov.pickle')))
     finish = time.time()
     conn.sendMsg('Built markov object in %5g s' %(finish-start),conn.dataN['chan'])

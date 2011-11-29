@@ -17,7 +17,7 @@ def search(conn):
 
 def urban(conn):
   try:
-    d = json.load(urllib2.urlopen("http://www.urbandictionary.com/iphone/search/define?term="+('+'.join(conn.dataN['words'][1:]))))
+    d = json.load(urllib2.urlopen("http://www.urbandictionary.com/iphone/search/define?term="+('%20'.join(conn.dataN['words'][1:]))))
     if 'pages' not in d:
       conn.sendMsg("Word is not defined")
     else:
@@ -62,8 +62,24 @@ def weather(conn):
         conn.sendMsg("Usage is ^weather <State> <Location>")
     except KeyError, e:
         conn.sendMsg("No information for this location")
+        
+def refreshFML(conn):
+  conn.sendMsg("Refreshing page")
+  conn.page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random")).findAll('div',{"class":"post article"})
 def fml(conn):
-    page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random"))
-    conn.sendMsg(page.find('div',{"class":"post article"}).p.text)
+  try:
+      if len(conn.page) == 0:
+        refreshFML(conn)
+  except AttributeError, e:
+      refreshFML(conn)
+  conn.sendMsg(conn.page.pop().p.text)
 
-triggers = {'^ud':urban,'^g':search, '^google':search,"^weather":weather,'^fml':fml}
+
+def levenshtein(w1,w2):
+  x = len(w1)
+  y = len(w2)
+#  table = [][]
+  for i in range(0,x+1):
+      pass
+  
+triggers = {'^ud':urban,'^g':search, '^google':search,"^weather":weather,'^fmyl':fml}

@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 import socket
 import os
-import sys
+import sys, traceback
 import gc
 
 abspath = os.path.abspath(__file__)
@@ -59,6 +59,7 @@ servers = [
 class GitHandler(SocketServer.StreamRequestHandler):
     def handle(self):
       try:
+        print "Incoming on socket: "+str(self.client_address)
         if self.client_address[0] not in ['127.0.0.1', '192.168.2.1','192.168.1.133']:
             return
 
@@ -66,17 +67,17 @@ class GitHandler(SocketServer.StreamRequestHandler):
         words = data.split()
         if(words[0][0] == '#'):
           try:
-            connections[0].sendMsg(' '.join(words[1:]),words[0])
+            connections[0].conn.sendMsg(' '.join(words[1:]),words[0])
           except:
             pass
         else:
-            connections[0].sendMsg(data,"#perwl")    
+            connections[0].conn.sendMsg(data,"#perwl")    
       except Exception, e:
         print >> sys.stderr, str(e)
 class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
    def __init__(self):
      try:
-        self.server = SocketServer.TCPServer(("192.168.1.133",6666),GitHandler)
+        self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
         #self.server.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
         Thread.__init__(self)
      except Exception, e:
@@ -96,7 +97,7 @@ class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self,server,channels,port = 6667,nick='TwatBot'):
-        self.server = server
+        self.server = server.lower()
         self.port = port
         self.nick = nick
         self.api = api
@@ -184,6 +185,7 @@ class Connection:
             os.unlink(pidfile)
         except:
             pass
+        sys.exit(0)
         
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -247,10 +249,14 @@ class ConnectionServer(Thread):
             if dataN.split()[0] == 'PING':
                 self.conn.ircCom('PONG', dataN.split()[1][1:])
                 continue
+        except IndexError:
+            break
         except KeyboardInterrupt:
             self.conn.close()
             break
         except Exception, e:
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            traceback.print_tb(exc_traceback, limit=2, file=sys.stdout)
             print >> sys.stderr, str(e)
             self.conn.decon()
             time.sleep(2)

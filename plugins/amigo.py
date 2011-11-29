@@ -6,7 +6,8 @@ import random
 from datetime import datetime
 import time
 help = "Copies the functionality of amigo"
-
+def suptime(conn):
+   conn.sendMsg(subprocess.check_output(["uptime"]))
 def uid(conn):
    conn.sendMsg(str(uuid.uuid1()).upper())
 def fortune(conn):
@@ -49,7 +50,7 @@ def dig(conn):
        socket.inet_aton(conn.dataN['words'][1])
        ip = "-x"
      except socket.error:
-       if not re.match(r'[a-zA-Z\d-]{,63}(\.[a-zA-Z\d-]{,63})*',words[1]):
+       if not re.match(r'[a-zA-Z\d-]{,63}(\.[a-zA-Z\d-]{,63})*',conn.dataN['words'][1]):
            conn.sendMsg('Please enter a valid domain name')
            return
        ip = " "
@@ -91,5 +92,6 @@ triggers = { '^fortune':fortune,
              '^dig':dig,
              '^uptime':uptime,
              '^hipster':hipster,
-             'asl':asl}
+             'asl':asl,
+             '^suptime':suptime}
     

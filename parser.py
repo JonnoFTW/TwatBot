@@ -3,7 +3,9 @@ from plugins import *
 from heapq import merge
 import traceback
 import sys
+from threading import Thread
 
+        
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
     print (conn.dataN['fool']+' '+conn.server+'/'+conn.dataN['chan']+': '+conn.dataN['msg'])
@@ -43,6 +45,19 @@ def parse(conn):
         elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
 
+class PluginRunner(Thread):
+    def __init__(self,conn,plugin):
+        self.conn = conn
+        self.chan = conn.dataN['chan']
+        self.plugin = plugin
+        Thread.__init__(self)
+    def run(self):
+        try:
+            self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
+        except Exception, err:
+            print >> sys.stderr, str(err)
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+ str(err) ,self.chan)
+        
 def check(pl,conn):
     for plugin in pl:
         if conn.dataN['fool'] not in (conn.ignores+conn.banned) and conn.dataN['words'][0] in plugin.triggers:
@@ -53,13 +68,12 @@ def check(pl,conn):
                 except: 
                     conn.sendNot("No help available")
 		    return
-            else:            
-                try:
-                    plugin.triggers[conn.dataN['words'][0]](conn)
-                    return
-                except Exception, err:
-                    print >> sys.stderr, str(err)
-                    conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+ str(err) ,conn.dataN['chan'])
+            else:
+                p = PluginRunner(conn,plugin)
+                p.start()                   
+                return
+            
+
 
 pluginList = [
     web,
