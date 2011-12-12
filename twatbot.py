@@ -1,4 +1,5 @@
 #!/usr/bin/python2.7
+# coding=utf-8
 import socket
 import os
 import sys, traceback
@@ -124,27 +125,32 @@ class Connection:
         
     def ircCom(self,command,msg):
       try:
-        tosend = (command +' ' + msg.replace('\n',"") + '\r\n').encode('utf-8','replace')
-        result = self.irc.send (tosend)
-        if result == 0:
-            print('Send timeout')
-        else:
-            print (tosend[:-2])
-      except Exception, e :
+        tosend = (unicode(' '.join(msg.splitlines())) + '\r\n').encode('utf-8','replace')
+        
+        chunks = [command+' '+tosend[start:start+512-len(command+' ')] for start in range(0, len(command+' '+tosend), 512)]
+        for i in chunks:
+            result = self.irc.send (i)
+            if result == 0:
+                print 'Send timeout'
+            else:
+                print i.rstrip()
+      except socket.error, e :
         print str(e)
+        self.decon()
+        time.sleep(10)
+        self.connect()
             
     def sendNotice(self,msg,fool):
         self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
         
     def sendMsg(self,msg,chan = None):
         if chan == None: chan = self.dataN['chan']
-        n = len('PRIVMSG '+chan+':')+512
-        for i in [msg[i:i+n] for i in range(0, len(msg), n)]:
-            self.ircCom('PRIVMSG '+chan,':'+i.rstrip('\r\n'))
+        self.ircCom('PRIVMSG '+chan,':'+msg)
+        
     def sendNot(self,msg):
         self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
  
-    def connect(self):
+    def connect(self): 
      self.errs = 0
      while True:
       try:
@@ -169,7 +175,7 @@ class Connection:
         self.ircCom (op,chan)
     def decon(self):
       try:
-        self.irc.shutdown(1)
+        self.irc.close()
       except Exception, e:
         print str(e)
     def close(self): 
@@ -212,6 +218,9 @@ class Connection:
 def line(data):
     raw = data
     try:
+        if data.split()[0] == "ERROR":
+            return None
+        
         data = data.rstrip('\r\n').split()
         fool = data[0].split('!')[0][1:]
         cmd  = data[1]
@@ -221,6 +230,7 @@ def line(data):
         print  ("An error occurred when parsing: "+raw)
         print >> sys.stderr, str(e)
         return None
+    
     dic = {
         'fool':fool,
         'msg':msg,
@@ -246,8 +256,9 @@ class ConnectionServer(Thread):
         gc.collect()
         try:
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
+            print dataN
             if dataN.split()[0] == 'PING':
-                self.conn.ircCom('PONG', dataN.split()[1][1:])
+                self.conn.ircCom('PONG', dataN.split(':')[1])
                 continue
         except IndexError:
             break
@@ -267,6 +278,11 @@ class ConnectionServer(Thread):
           self.conn.dataN = line(i)
           if not self.conn.dataN: continue
           parser.parse(self.conn)
+          if "Ping timeout" in i and self.conn.nick in i and "ERROR" in i:
+            self.conn.decon()
+            time.sleep(5)
+            self.conn.connect()
+            break
           if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'] in self.conn.chans.keys() or self.conn.dataN['chan'] == self.conn.nick:
             try:
                 if self.conn.dataN['fool'] in self.conn.admins:

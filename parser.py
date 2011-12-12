@@ -49,6 +49,7 @@ class PluginRunner(Thread):
     def __init__(self,conn,plugin):
         self.conn = conn
         self.chan = conn.dataN['chan']
+        self.dataN = dict(conn.dataN)
         self.plugin = plugin
         Thread.__init__(self)
     def run(self):
@@ -56,7 +57,7 @@ class PluginRunner(Thread):
             self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+ str(err) ,self.chan)
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.chan)
         
 def check(pl,conn):
     for plugin in pl:

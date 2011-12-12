@@ -81,6 +81,15 @@ def asl(conn):
 #   conn.sendMsg('new behaviour!')
    places = ['nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
    conn.sendMsg('/'.join([str(random.randint(8,30)),random.choice(['m','f']),random.choice(places)]))
+
+def flip(conn):
+   if random.randint(0,1):
+      msg = 'Heads'
+   else:
+      msg = 'Tails'
+   conn.sendMsg(msg)
+def roll(conn):
+   conn.sendMsg(str(random.randint(1,6)))
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -93,5 +102,7 @@ triggers = { '^fortune':fortune,
              '^uptime':uptime,
              '^hipster':hipster,
              'asl':asl,
-             '^suptime':suptime}
+             '^suptime':suptime,
+             '^roll':roll,
+             '^flip':flip}
     
