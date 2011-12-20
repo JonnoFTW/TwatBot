@@ -77,6 +77,7 @@ def hipster(conn):
    while(len( (' '.join(out).split())) < 5):
       out.append(hip[random.randint(0,l)])
    conn.sendMsg(' '.join(out))
+   
 def asl(conn):
 #   conn.sendMsg('new behaviour!')
    places = ['nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
@@ -87,9 +88,23 @@ def flip(conn):
       msg = 'Heads'
    else:
       msg = 'Tails'
-   conn.sendMsg(msg)
+   conn.sendMsg('A coin is flipped, '+msg)
 def roll(conn):
-   conn.sendMsg(str(random.randint(1,6)))
+   conn.sendMsg('A dice is rolled '+str(random.randint(1,6)))
+
+def joke(conn):
+   jokes = []
+   buf = []
+   for line in open('plugins/jokes.txt'):
+      if line.split() == []:
+         if buf != []:
+            jokes.append(buf)
+            buf = []
+      else:
+         buf.append(line.strip())
+   for i in random.choice(jokes):
+      conn.sendMsg(i)
+                                 
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -104,5 +119,6 @@ triggers = { '^fortune':fortune,
              'asl':asl,
              '^suptime':suptime,
              '^roll':roll,
+             '^joke':joke,
              '^flip':flip}
     

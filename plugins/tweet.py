@@ -7,6 +7,21 @@ def tag(x):
         return "#"+x
     else:
         return x
+def getTwit(conn,user):
+        try:
+            result = conn.api.GetUserTimeline(user)[0].text
+        except Exception, e:
+            result = 'Could not get twitter' + str(e)
+        return result
+
+def setTwit(conn,msg):
+        try:
+            result = conn.api.PostUpdate(msg)
+            return result
+        except Exception, e:
+            self.sendMsg( 'Could not update twitter: '+ str(e) )
+            return False
+
 def tweet(conn):
     if conn.dataN['fool'] not in conn.banned and conn.dataN['chan'] not in conn.ignores:
         if ("".join(conn.chans[conn.dataN['chan']][len(conn.chans[conn.dataN['chan']])-1].split())) != "":
@@ -15,7 +30,7 @@ def tweet(conn):
             except:
               index = -1
             if conn.dataN['fool'] == conn.chans[conn.dataN['chan']][index].split(':')[0]:
-                conn.sendMsg("Can't quote yourself"+( '!'*(random.randint(0,2))),conn.dataN['chan'])
+                conn.sendMsg("Can't quote yourself"+( '!'*(random.randint(0,2))))
                 return
             if any(map(lambda x: x.lower() in badwords,conn.dataN['words'])):
                 conn.sendMsg('Naughty words not allowed')
@@ -29,15 +44,15 @@ def tweet(conn):
                 toSend = ' '.join(map(lambda x: tag(x),toSend.split()))
                 if toSend.find("\001ACTION") != -1:
                     toSend = '*** '+(toSend.replace(': \001ACTION','',1)[:-1])
-                r = conn.setTwit(toSend,conn.dataN['chan'])
+                r = setTwit(conn,toSend)
                 spaces = '!'*(random.randint(0,2))  
                 if r!= False: conn.sendMsg('Sending to twitter'+spaces) 
 
 def last(conn):
     if len(conn.dataN['words']) > 1:
-        conn.sendMsg(conn.getTwit(filter(lambda x: ord(x) > 16,conn.dataN['words'][1])) ,conn.dataN['chan'])
+        conn.sendMsg(getTwit(conn,conn.dataN['words'][1]))
     else:
-        conn.sendMsg(conn.getTwit('Buttsworth_').replace('/\r\n|\r|\n/g',''),conn.dataN['chan'])
+        conn.sendMsg(getTwit(conn,'Buttsworth_'))
 
 
 triggers = {'^twat':tweet,'^^':tweet,'^last':last}

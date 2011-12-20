@@ -30,7 +30,7 @@ def firstrun(conn):
     start = time.time()
 #    conn.log.seek(0,0)
 #    trainer = open('/home/jonno/lambdabot/trainer.log','r')
-    conn.setMarkov(markovgenpy.Markov(f))
+    conn.conn.setMarkov(markovgenpy.Markov(f))
     f.close()
     #conn.setMarkov(pickle.load(open('markov.pickle')))
     finish = time.time()
@@ -40,7 +40,10 @@ def markov(conn):
     try:
         conn.sendMsg(conn.markov.generate_markov_text(random.randint(5,20)),conn.dataN['chan'])
     except Exception, e:
-        conn.sendMsg('Generating database',conn.dataN['chan'])
+        conn.sendMsg('Generating database')
         firstrun(conn)
 
-triggers = { '^markov':markov,'^markovgen':firstrun}
+def rem(conn):
+    conn.sendMsg('Freeing memory, removing markov object')
+    del conn.conn.markov
+triggers = { '^markov':markov,'^markovgen':firstrun,'^freemarkov':rem}

@@ -44,12 +44,32 @@ def parse(conn):
             check(list(merge(pluginList, adminPlugins)),conn)
         elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
-
+class ircState:
+    def __init__(self,conn):
+        self.conn = conn
+        self.banned = conn.banned
+        self.api = conn.api
+        self.tells = conn.tells
+        self.ignores = conn.ignores
+        self.uptime = conn.uptime
+        self.chans = conn.chans
+        self.dataN = dict(conn.dataN)
+    def sendNotice(self,msg,fool):
+        self.conn.sendNotice(msg,fool)
+    def sendMsg(self,msg,chan = None):
+        self.conn.sendMsg(msg,self.dataN['chan'])
+    def sendNot(self,msg):
+        self.conn.sendNot(msg)
+    def decon(self):
+        self.conn.decon()
+    def joinChan(self,chan):
+        self.conn.joinChan(chan)
+    def close(self):
+        self.conn.close()
+    
 class PluginRunner(Thread):
     def __init__(self,conn,plugin):
-        self.conn = conn
-        self.chan = conn.dataN['chan']
-        self.dataN = dict(conn.dataN)
+        self.conn = ircState(conn)
         self.plugin = plugin
         Thread.__init__(self)
     def run(self):
@@ -57,7 +77,7 @@ class PluginRunner(Thread):
             self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.chan)
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
         
 def check(pl,conn):
     for plugin in pl:

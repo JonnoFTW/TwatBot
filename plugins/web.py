@@ -32,6 +32,7 @@ def urban(conn):
     conn.sendMsg("Usage is: ^ud <word>")
        
 def weather(conn):
+    chan = str(conn.dataN['chan'])
     try:
         state = conn.dataN['words'][1].lower()
         loc = ' '.join(conn.dataN['words'][2:]).lower()
@@ -49,15 +50,15 @@ def weather(conn):
         out = ""
         for i in ['City',u'Temp(°C)','Wind(m/s)','Rain(mm)','Humidity(%)','Wind_Dir','Wind_spd(km/h)','Visibility(km)','Updated']:
            out += '%s ' % (i.rjust(10))
-        conn.sendMsg(out)
+        conn.sendMsg(out,chan)
         out = ""
         for i in ['name','air_temp',"wind_spd_kmh","rain_trace","rel_hum","wind_dir","wind_spd_kmh","vis_km","local_date_time"]:
            out += "%s " % (str(q['observations']['data'][0][i]).rjust(10))
-        conn.sendMsg(out)
+        conn.sendMsg(out,chan)
     except IndexError, e:
-        conn.sendMsg("Usage is ^weather <State> <Location>")
+        conn.sendMsg("Usage is ^weather <State> <Location>",chan)
     except NameError, e:
-        conn.sendMsg("No information for this location")
+        conn.sendMsg("No information for this location",chan)
         
 def refreshFML(conn):
   conn.sendMsg("Refreshing page")
@@ -70,7 +71,15 @@ def fml(conn):
       refreshFML(conn)
   conn.sendMsg(conn.page.pop().p.text)
 
-
+def etymology(conn):
+  try:
+    page = BeautifulSoup(urllib2.urlopen("http://www.etymonline.com/index.php?search="+conn.dataN['words'][1]))
+    conn.sendMsg(page.find('dd').text)
+  except IndexError,e :
+    conn.sendMsg('usage is ^etym <word>')
+  except AttributeError:
+    conn.sendMsg('No word history available')
+  
 def levenshtein(w1,w2):
   x = len(w1)
   y = len(w2)
@@ -90,5 +99,6 @@ triggers = {'^ud':urban,
             '^google':search,
             "^weather":weather,
             '^fmyl':fml,
-            '^fb':openBook
+            '^fb':openBook,
+            '^etym':etymology
             }

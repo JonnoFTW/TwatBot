@@ -98,6 +98,7 @@ class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self,server,channels,port = 6667,nick='TwatBot'):
+        self.quitting = False
         self.server = server.lower()
         self.port = port
         self.nick = nick
@@ -134,7 +135,7 @@ class Connection:
                 print 'Send timeout'
             else:
                 print i.rstrip()
-      except socket.error, e :
+      except socket.timeout, e :
         print str(e)
         self.decon()
         time.sleep(10)
@@ -197,20 +198,7 @@ class Connection:
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
         
-    def getTwit(self,user):
-        try:
-            result = self.api.GetUserTimeline(user)[0].text
-        except Exception, e:
-            result = 'Could not get twitter' + str(e)
-        return result
 
-    def setTwit(self,msg,chan):
-        try:
-            result = self.api.PostUpdate(msg)
-            return result
-        except Exception, e:
-            self.sendMsg( 'Could not update twitter: '+ str(e) )
-            return False
     def setMarkov(self,obj):
         self.markov = obj
 
@@ -224,8 +212,12 @@ def line(data):
         data = data.rstrip('\r\n').split()
         fool = data[0].split('!')[0][1:]
         cmd  = data[1]
-        chan = data[2].replace(':','')
-        msg  = ' '.join(data[3:])[1:]
+        if cmd == 'QUIT':
+            chan = ''
+            msg = ' '.join(data[2:])
+        else:
+            chan = data[2].replace(':','')
+            msg  = ' '.join(data[3:])[1:]
     except Exception, e:
         print  ("An error occurred when parsing: "+raw)
         print >> sys.stderr, str(e)
@@ -257,24 +249,31 @@ class ConnectionServer(Thread):
         try:
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
             print dataN
-            if dataN.split()[0] == 'PING':
-                self.conn.ircCom('PONG', dataN.split(':')[1])
-                continue
-        except IndexError:
-            break
+        except socket.timeout, e:
+            print str(e)
+            self.conn.decon()
+            time.sleep(2)
+            self.conn.irc = self.conn.connect()
         except KeyboardInterrupt:
             self.conn.close()
             break
-        except Exception, e:
-            exc_type, exc_value, exc_traceback = sys.exc_info()
-            traceback.print_tb(exc_traceback, limit=2, file=sys.stdout)
+        for i in dataN.splitlines():
+          try:
+              if i.split()[0] == 'PING':
+                self.conn.ircCom('PONG', i.split(':')[1])
+                continue
+          except IndexError:
+            return
+          except Exception, e:
+            if self.conn.quitting:
+                os.unlink(pidfile)
+                listener.stop()
+                sys.exit(0)
             print >> sys.stderr, str(e)
             self.conn.decon()
             time.sleep(2)
             self.conn.irc = self.conn.connect()
             continue
-        for i in dataN.splitlines():
-    #      print i
           self.conn.dataN = line(i)
           if not self.conn.dataN: continue
           parser.parse(self.conn)
@@ -307,6 +306,7 @@ class ConnectionServer(Thread):
                     if self.conn.dataN['chan'] != self.conn.nick and self.conn.dataN['fool'] not in self.conn.ignores: self.conn.chans[self.conn.dataN['chan']].append(self.conn.dataN['fool']+': '+self.conn.dataN['msg'])
             except IndexError:
                 pass
+            
 connections = []
 for i in servers:
     connections.append(ConnectionServer(i['server'],i['channels']))
