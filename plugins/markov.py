@@ -25,6 +25,13 @@ def scrape(conn):
     
 
 def firstrun(conn):
+    try:
+        if conn.conn.markov == None:
+            return
+    except:
+        pass
+    conn.conn.markov = None
+    conn.sendMsg('Generating database')
 #    scrape(conn)
     f = open('text.log','r')
     start = time.time()
@@ -38,9 +45,8 @@ def firstrun(conn):
 
 def markov(conn):
     try:
-        conn.sendMsg(conn.markov.generate_markov_text(random.randint(5,20)),conn.dataN['chan'])
+        conn.sendMsg(conn.conn.markov.generate_markov_text(random.randint(5,20)),conn.dataN['chan'])
     except Exception, e:
-        conn.sendMsg('Generating database')
         firstrun(conn)
 
 def rem(conn):

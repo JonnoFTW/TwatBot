@@ -44,6 +44,10 @@ def parse(conn):
             check(list(merge(pluginList, adminPlugins)),conn)
         elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
+    #everything else is passed to the default plugin
+    p = PluginRunner(conn,default)
+    p.start()
+    
 class ircState:
     def __init__(self,conn):
         self.conn = conn
@@ -74,10 +78,14 @@ class PluginRunner(Thread):
         Thread.__init__(self)
     def run(self):
         try:
-            self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
+            if self.plugin == default:
+                self.plugin.default(self.conn)
+            else:
+                self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
+            if self.plugin != default:
+                self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
         
 def check(pl,conn):
     for plugin in pl:
@@ -92,9 +100,7 @@ def check(pl,conn):
             else:
                 p = PluginRunner(conn,plugin)
                 p.start()                   
-                return
-            
-
+                return         
 
 pluginList = [
     web,

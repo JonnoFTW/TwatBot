@@ -94,6 +94,16 @@ listener = GitServ()
 listener.start()
 log = open('text.log','a+')
 logLock = Lock()
+
+class WhoThread(Thread):
+    def __init__(self,conn):
+        self.conn = conn
+        Thread.__init__(self)
+    def run(self):
+        time.sleep(60)
+        for i in conn.channels:
+            conn.ircCom('WHO',i)
+
 class Connection:
     """A class to hold the connection to the server
     and related information"""
@@ -118,11 +128,17 @@ class Connection:
         self.chans = dict()
         for i in channels:
             self.chans[i] = None
+        #Mapping of channel to list of users
+        self.users = dict()
+        for i in channels:
+            self.users[i] = set()
         self.playing = False
         self.banned = getFile('banned')
         self.ignores = getFile('ignore')
         self.irc = self.connect()
         self.uptime = datetime.datetime.now()
+        self.who = WhoThread(self)
+        
         
     def ircCom(self,command,msg):
       try:
@@ -197,7 +213,7 @@ class Connection:
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
-        
+        self.ircCom('WHO',chan)
 
     def setMarkov(self,obj):
         self.markov = obj
@@ -248,7 +264,7 @@ class ConnectionServer(Thread):
         gc.collect()
         try:
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
-            print dataN
+            #print dataN
         except socket.timeout, e:
             print str(e)
             self.conn.decon()
