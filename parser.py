@@ -45,6 +45,7 @@ def parse(conn):
         elif conn.dataN['fool'] not in conn.banned:
             check(pluginList,conn)
     #everything else is passed to the default plugin
+            
     p = PluginRunner(conn,default)
     p.start()
     
@@ -61,7 +62,9 @@ class ircState:
     def sendNotice(self,msg,fool):
         self.conn.sendNotice(msg,fool)
     def sendMsg(self,msg,chan = None):
-        self.conn.sendMsg(msg,self.dataN['chan'])
+        if chan == None:
+            chan = self.dataN['chan']
+        self.conn.sendMsg(msg,chan)
     def sendNot(self,msg):
         self.conn.sendNot(msg)
     def decon(self):
@@ -77,6 +80,8 @@ class PluginRunner(Thread):
         self.plugin = plugin
         Thread.__init__(self)
     def run(self):
+        if self.conn.dataN['fool'] in (self.conn.ignores + self.conn.banned):
+            return
         try:
             if self.plugin == default:
                 self.plugin.default(self.conn)
@@ -84,8 +89,7 @@ class PluginRunner(Thread):
                 self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            if self.plugin != default:
-                self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
         
 def check(pl,conn):
     for plugin in pl:

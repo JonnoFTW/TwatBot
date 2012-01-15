@@ -2,6 +2,7 @@
 from BeautifulSoup import BeautifulSoup
 import urllib2
 import json
+import xml.dom.minidom
 help = "^google <string> does a google search, ^urban <word> gets first urbandictionary def, ^weather <State> <Location> gets the weather from the BOM. Australia only!"
  
 def convert(s):
@@ -24,9 +25,10 @@ def urban(conn):
       i = 0
     d = json.load(urllib2.urlopen("http://www.urbandictionary.com/iphone/search/define?term="+('%20'.join(conn.dataN['words'][1:]))))
     if 'pages' not in d:
-      conn.sendMsg("Word is not defined")
+      suggestions = map(lambda x: x['term'],(filter(lambda x: x['type'] == 'link',d['list'])))[:4]
+      conn.sendMsg("Word is not defined. Perhaps you meant: "+(', '.join(suggestions)))  
     else:
-      conn.sendMsg(d['list'][i]['definition']+'--- '+d['list'][i]['example'])
+      conn.sendMsg(d['list'][int(i)]['definition']+'--- '+d['list'][int(i)]['example'])
   except IndexError, e:
     print e
     conn.sendMsg("Usage is: ^ud <word>")
@@ -58,23 +60,37 @@ def weather(conn):
     except IndexError, e:
         conn.sendMsg("Usage is ^weather <State> <Location>",chan)
     except NameError, e:
-        conn.sendMsg("No information for this location",chan)
+        # Using google weather now
+        p = urllib2.urlopen("http://www.google.com/ig/api?weather="+('+'.join(conn.dataN['words'][1:]))).read()
+        dom = xml.dom.minidom.parseString(p)
+        info = dict()
+        info["city"] = dom.getElementsByTagName("city")[0].getAttribute("data")
+        for i in dom.getElementsByTagName("current_conditions")[0].childNodes:
+            info[i.tagName] = i.getAttribute("data")
+        conn.sendMsg(' '.join(["City:",     info["city"],
+                                u"Temp (°C):",  info["temp_c"],
+                                info["humidity"],
+                                info["wind_condition"],
+                                "Condition:", info["condition"]
+                                ])
+                    )
+        #conn.sendMsg("No information for this location",chan)
         
 def refreshFML(conn):
   conn.sendMsg("Refreshing page")
-  conn.page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random")).findAll('div',{"class":"post article"})
+  conn.conn.page = BeautifulSoup(urllib2.urlopen("http://fmylife.com/random")).findAll('div',{"class":"post article"})
 def fml(conn):
   try:
-      if len(conn.page) == 0:
+      if len(conn.conn.page) == 0:
         refreshFML(conn)
   except AttributeError, e:
       refreshFML(conn)
-  conn.sendMsg(conn.page.pop().p.text)
+  conn.sendMsg(conn.conn.page.pop().p.text)
 
 def etymology(conn):
   try:
     page = BeautifulSoup(urllib2.urlopen("http://www.etymonline.com/index.php?search="+conn.dataN['words'][1]))
-    conn.sendMsg(page.find('dd').text)
+    conn.sendMsg(page.find('dd').text[:400])
   except IndexError,e :
     conn.sendMsg('usage is ^etym <word>')
   except AttributeError:
@@ -89,9 +105,14 @@ def levenshtein(w1,w2):
 def openBook(conn):
   try:
     j =json.load(urllib2.urlopen("http://graph.facebook.com/search?q="+('%20'.join(conn.dataN['words'][1:]))+"&type=post"))
-    conn.sendMsg(j["data"][0]["from"]["name"]+": "+j["data"][0]["message"])
+    for i in j["data"]:
+      try:
+        conn.sendMsg((i["from"]["name"]+": "+i["message"])[:750])
+        break
+      except:
+        pass
     del j
-  except IndexError, e:
+  except (IndexError, urllib2.HTTPError), e:
     conn.sendMsg("Usage is ^fb <search string>")
   
 triggers = {'^ud':urban,

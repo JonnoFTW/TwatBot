@@ -2,11 +2,6 @@ import random
 help = """^^ sends the previous line to twitter. Can't quote yourself either. ^^ n sends the nth line from the scrollback twitter. View with ^scroll. n is n places from the start of the scroll starting at 0. ^last gets the last tweet from Buttsworth. '^last user' gets the last tweet from user."""
 badwords = ["jihad","anal","nigger","fuck","global-jihad", "beatdownbrigade", "404chan", "genericus", "hussyvid", "pthc", "kdv", "r@ygold", "kiddy","#ff"]
 tags = ["perwlcon","perwl","perl","python"]
-def tag(x):
-    if x.lower() in tags:
-        return "#"+x
-    else:
-        return x
 def getTwit(conn,user):
         try:
             result = conn.api.GetUserTimeline(user)[0].text
@@ -41,7 +36,9 @@ def tweet(conn):
 		else:
                     toSend = (conn.chans[conn.dataN['chan']].pop())[:140]
                 print(toSend)
-                toSend = ' '.join(map(lambda x: tag(x),toSend.split()))
+                for i in tags:
+                    toSend = toSend.replace(i,"#"+i)
+                #toSend = ' '.join(map(lambda x: tag(x),toSend.split()))
                 if toSend.find("\001ACTION") != -1:
                     toSend = '*** '+(toSend.replace(': \001ACTION','',1)[:-1])
                 r = setTwit(conn,toSend)

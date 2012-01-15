@@ -1,3 +1,4 @@
+# coding=utf-8
 import MySQLdb
 import MySQLdb.cursors
 help = "^tell will private message the given person whenever and whereever it sees them again. use ^read to read any message you may have"
@@ -43,7 +44,10 @@ def getTell(conn):
       else:
           conn.sendNot("You have the following messages: ")
           for i in msgs:
-              conn.sendNot("From: {0} on {1} -----> {2}".format(i[0],i[2],i[1]))
+              try:
+                  conn.sendNot(u"From: {0} on {1} -----> {2}".format(i[0],i[2],i[1]).decode('utf-8'))
+              except:
+                  pass
           cursor.execute("DELETE FROM tell WHERE `to` = %s",(conn.dataN['fool']))
           cursor.close()
           try:
@@ -52,7 +56,7 @@ def getTell(conn):
             print "Could not remove user from send to list"
     except Exception, e:
         print e
-        conn.sendMsg("Something went wrong telling the message! %s" % (str(e)))
+        conn.sendNot("Something went wrong telling the message! %s" % (str(e)))
     finally:
         cursor.close()
         db.close()

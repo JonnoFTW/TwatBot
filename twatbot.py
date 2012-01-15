@@ -101,8 +101,8 @@ class WhoThread(Thread):
         Thread.__init__(self)
     def run(self):
         time.sleep(60)
-        for i in conn.channels:
-            conn.ircCom('WHO',i)
+        for i in self.conn.chans:
+            self.conn.ircCom('WHO',i)
 
 class Connection:
     """A class to hold the connection to the server
@@ -125,28 +125,36 @@ class Connection:
         cu.close()
         db.close()
         self.admins = ['Jonno_FTW','Garfunkel']
+        self.nazi = False
         self.chans = dict()
         for i in channels:
             self.chans[i] = None
         #Mapping of channel to list of users
         self.users = dict()
-        for i in channels:
-            self.users[i] = set()
         self.playing = False
         self.banned = getFile('banned')
         self.ignores = getFile('ignore')
         self.irc = self.connect()
         self.uptime = datetime.datetime.now()
         self.who = WhoThread(self)
+        self.who.start()
         
         
     def ircCom(self,command,msg):
       try:
         tosend = (unicode(' '.join(msg.splitlines())) + '\r\n').encode('utf-8','replace')
+
         
-        chunks = [command+' '+tosend[start:start+512-len(command+' ')] for start in range(0, len(command+' '+tosend), 512)]
+        chunks = []
+        if command[-1] != ":":
+            command = command+' '
+        tosend = tosend.lstrip()
+        while tosend:
+            chunks.append(command+(tosend[:510-len(command)]))
+            tosend = tosend[510-len(command):]
         for i in chunks:
-            result = self.irc.send (i)
+            result = self.irc.send(i)
+            time.sleep(1)
             if result == 0:
                 print 'Send timeout'
             else:
@@ -158,14 +166,14 @@ class Connection:
         self.connect()
             
     def sendNotice(self,msg,fool):
-        self.ircCom('NOTICE '+fool,":\001"+msg+"\001")
+        self.ircCom('NOTICE '+fool+':',"\001"+msg+"\001")
         
     def sendMsg(self,msg,chan = None):
         if chan == None: chan = self.dataN['chan']
-        self.ircCom('PRIVMSG '+chan,':'+msg)
+        self.ircCom('PRIVMSG '+chan+' :',msg)
         
     def sendNot(self,msg):
-        self.ircCom('NOTICE '+self.dataN['fool'],':'+msg.rstrip('\r\n'))
+        self.ircCom('NOTICE '+self.dataN['fool']+ ' :',msg.rstrip('\r\n'))
  
     def connect(self): 
      self.errs = 0
@@ -213,6 +221,7 @@ class Connection:
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
+        self.users[chan] = set()
         self.ircCom('WHO',chan)
 
     def setMarkov(self,obj):
@@ -264,7 +273,7 @@ class ConnectionServer(Thread):
         gc.collect()
         try:
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
-            #print dataN
+            print dataN
         except socket.timeout, e:
             print str(e)
             self.conn.decon()
@@ -302,7 +311,7 @@ class ConnectionServer(Thread):
             try:
                 if self.conn.dataN['fool'] in self.conn.admins:
                   try:
-                    if self.conn.dataN['words'][0] == '^connect':
+                    if len(self.conn.dataN['words']) > 0 and self.conn.dataN['words'][0] == '^connect':
                       connections.append(ConnectionServer(self.conn.dataN['words'][1],[self.conn.dataN['words'][2]],nick='Tw4tb0t'))
                       if connections[-1].m == 1:
                         self.conn.sendMsg("Successfully connected")

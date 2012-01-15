@@ -104,7 +104,26 @@ def joke(conn):
          buf.append(line.strip())
    for i in random.choice(jokes):
       conn.sendMsg(i)
-                                 
+
+def ff(conn):
+   conn.sendMsg("\002[SM] Friendly fire is disabled.\002")
+   
+def thetime(conn):
+   conn.sendMsg(time.strftime("%H:%M:%S",time.localtime()))
+
+def rank(conn):
+   u = len(conn.conn.users[conn.dataN['chan']])
+   conn.sendMsg("Your rank is: "+str(random.randint(1,u))+"/"+str(u))
+
+def statsme(conn):
+   stats = ["p90 pub hero","deagle hero","awp whore","team flasher",
+           "meat shield","gary","knif crab","DUAL AKIMBO","\002100% MAVERICK\002",
+            "cv-47 clutch champion","GLOCKenspiel","happy camper",
+            "grrgrgrgrgrgrgr","(gary)","long A rusher","afk","naked",
+            "clarion burst fire headshot","bhopping scout master race","MP5 navy SEAL",
+            "l33t kr3w","pot plant"]
+   conn.sendMsg(conn.dataN['fool']+ " status: "+random.choice(stats))
+   
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -120,5 +139,11 @@ triggers = { '^fortune':fortune,
              '^suptime':suptime,
              '^roll':roll,
              '^joke':joke,
-             '^flip':flip}
+             '^flip':flip,
+
+             'ff':ff,
+             'thetime':thetime,
+             'rank':rank,
+             'statsme':statsme
+             }
     
