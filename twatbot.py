@@ -100,7 +100,6 @@ class WhoThread(Thread):
         self.conn = conn
         Thread.__init__(self)
     def run(self):
-        time.sleep(60)
         for i in self.conn.chans:
             self.conn.ircCom('WHO',i)
 
@@ -109,10 +108,12 @@ class Connection:
     and related information"""
     def __init__(self,server,channels,port = 6667,nick='TwatBot'):
         self.quitting = False
+        self.printAll = False
         self.server = server.lower()
         self.port = port
         self.nick = nick
         self.api = api
+        self.steamKey = keys[5]
         self.srvthread = listener
         db = plugins.tell.getDB()
         cu = db.cursor()
@@ -124,7 +125,7 @@ class Connection:
         print self.tells
         cu.close()
         db.close()
-        self.admins = ['Jonno_FTW','Garfunkel']
+        self.admins = ['Jonno_FTW','Garfunkel',"Garfunk"]
         self.nazi = False
         self.chans = dict()
         for i in channels:
@@ -273,7 +274,8 @@ class ConnectionServer(Thread):
         gc.collect()
         try:
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
-            print dataN
+            if self.conn.printAll:
+                print dataN
         except socket.timeout, e:
             print str(e)
             self.conn.decon()

@@ -2,7 +2,7 @@
 from plugins import *
 from heapq import merge
 import traceback
-import sys
+import sys, os
 from threading import Thread
 
         
@@ -89,7 +89,9 @@ class PluginRunner(Thread):
                 self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+ str(err) ,self.conn.dataN['chan'])
+            exc_type, exc_obj, exc_tb = sys.exc_info()
+            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
         
 def check(pl,conn):
     for plugin in pl:
@@ -120,7 +122,9 @@ pluginList = [
     checkem,
     markov,
 #    laughter,
-    fullwidth
+    fullwidth,
+    counterstrike,
+    steam
 ]
 adminPlugins = [
     joinpart,
