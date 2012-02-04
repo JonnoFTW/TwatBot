@@ -58,8 +58,11 @@ def resetmaps(conn):
     maps = ["cs_office","cs_assault","de_dust2","de_aztec","de_inferno","cs_italy","de_train","de_nuke","fy_iceworld","de_dust"]
     random.shuffle(maps)
     conn.conn.maps = maps
-    
+
+def gg(conn):
+    conn.sendMsg("gg")    
 triggers ={  'ff':ff,
+             'gg':gg,
              'thetime':thetime,
              'rank':rank,
              'statsme':statsme,

@@ -1,3 +1,6 @@
+import MySQLdb
+import MySQLdb.cursors
+import cPickle
 import re
 import socket
 import uuid 
@@ -105,8 +108,60 @@ def joke(conn):
    for i in random.choice(jokes):
       conn.sendMsg(i)
 
-
+def doubles(conn):
+   db = MySQLdb.connect (host="max-damage",user="fsa",passwd="^LkU!9BEd*4J&C2`Y6s.-=",db="tell")
+   cursor = db.cursor()
+   try:
+     if conn.dataN['words'][1]:
+       print "Getting user"
+       # Get the user specified
+       cursor.execute("SELECT * FROM doubles WHERE `nick` = '%s'" % (db.escape_string(conn.dataN['words'][1])))
+       x= cursor.fetchone()
+       if x:
+         print cursor._last_executed
+         print x
+         conn.sendMsg(conn.dataN['words'][1]+ ': Dubs:'+str(x[1])+ ' Trips:'+str(x[2])+' Quads:'+str(x[3])+ ' Misses:'+str(x[4]))
+       else:
+         conn.sendMsg('No results for user')
+   except IndexError:
+    n = str(random.randint(0,10000)).zfill(4)
+    count = 0
+    for i in n[::-1]:
+       if i == n[-1]:
+          count += 1
+       else:
+          break
+    out = {1:" ",2:", DOUBLES",3:", TRIPS",4:", QUADS"}[count]
+    c = {1:'misses',2:'dubs',3:'trips',4:'quads'}[count]
+    nick = db.escape_string(conn.dataN['fool'])
+    vals = [nick,0,0,0,0]
+    vals[count] = 1
+    vals = str(tuple(vals))
+    cursor.execute("""INSERT INTO `doubles` (`nick`,`misses`,`dubs`,`trips`,`quads`) 
+                        VALUES %s 
+                        ON DUPLICATE KEY UPDATE `%s` = `%s` +1 ;""" % (vals,c,c))
+    print cursor._last_executed
+    print count
+    if count > 1:
+        conn.sendMsg("You rolled "+n+out)
+    else:
+        conn.sendNot("You rolled "+n+out)
    
+def latin(conn):
+    try:
+      if conn.conn.latin:
+        #Print a random latin phrase
+        key = random.choice(conn.conn.latin.keys())
+        print key
+        conn.sendMsg(key +' ----> '+conn.conn.latin[key])
+    except AttributeError, e:
+      conn.conn.latin = None
+      pkl = open('plugins/latin.pkl','rb') 
+      conn.conn.latin = cPickle.load(pkl)
+      conn.sendMsg("Loaded phrases")
+      pkl.close()
+      latin(conn)
+      
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^time':ti,
@@ -122,6 +177,8 @@ triggers = { '^fortune':fortune,
              '^suptime':suptime,
              '^roll':roll,
              '^joke':joke,
-             '^flip':flip
+             '^flip':flip,
+             '^doubles':doubles,
+             '^latin':latin
 }
     

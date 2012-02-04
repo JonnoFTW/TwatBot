@@ -4,7 +4,7 @@ import socket
 import os
 import sys, traceback
 import gc
-
+from Queue import Queue
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
@@ -91,6 +91,7 @@ class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
 
 
 listener = GitServ()
+listener.daemon = True
 listener.start()
 log = open('text.log','a+')
 logLock = Lock()
@@ -107,6 +108,10 @@ class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self,server,channels,port = 6667,nick='TwatBot'):
+        self.msgQueue = Queue()
+        self.disp = Thread(target=self.dispatcher)
+        self.disp.daemon = True
+        self.disp.start()
         self.quitting = False
         self.printAll = False
         self.server = server.lower()
@@ -140,12 +145,26 @@ class Connection:
         self.who = WhoThread(self)
         self.who.start()
         
+    def dispatcher(self):
+        while True:
+          try:
+            item = self.msgQueue.get()
+            result = self.irc.send(item)
+            time.sleep(1)
+            if result == 0:
+                print 'Send timeout'
+            else:
+                print i
+            self.msgQueue.task_done()
+            
+          except (socket.timeout,socket.error),  e :
+            print str(e)
+            self.decon()
+            time.sleep(10)
+            self.connect()
         
     def ircCom(self,command,msg):
-      try:
         tosend = (unicode(' '.join(msg.splitlines())) + '\r\n').encode('utf-8','replace')
-
-        
         chunks = []
         if command[-1] != ":":
             command = command+' '
@@ -154,17 +173,7 @@ class Connection:
             chunks.append(command+(tosend[:510-len(command)]))
             tosend = tosend[510-len(command):]
         for i in chunks:
-            result = self.irc.send(i)
-            time.sleep(1)
-            if result == 0:
-                print 'Send timeout'
-            else:
-                print i.rstrip()
-      except socket.timeout, e :
-        print str(e)
-        self.decon()
-        time.sleep(10)
-        self.connect()
+            self.msgQueue.put(i)
             
     def sendNotice(self,msg,fool):
         self.ircCom('NOTICE '+fool+':',"\001"+msg+"\001")
