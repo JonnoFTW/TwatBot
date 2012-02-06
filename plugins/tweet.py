@@ -14,7 +14,7 @@ def setTwit(conn,msg):
             result = conn.api.PostUpdate(msg)
             return result
         except Exception, e:
-            self.sendMsg( 'Could not update twitter: '+ str(e) )
+            conn.sendMsg( 'Could not update twitter: '+ str(e) )
             return False
 
 def tweet(conn):

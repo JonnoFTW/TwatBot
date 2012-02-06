@@ -155,13 +155,14 @@ class Connection:
                 print 'Send timeout'
             else:
                 print i
-            self.msgQueue.task_done()
             
-          except (socket.timeout,socket.error),  e :
-            print str(e)
+          except :
+          #  print str(e)
             self.decon()
             time.sleep(10)
             self.connect()
+          finally:
+            self.msgQueue.task_done()
         
     def ircCom(self,command,msg):
         tosend = (unicode(' '.join(msg.splitlines())) + '\r\n').encode('utf-8','replace')
@@ -293,6 +294,10 @@ class ConnectionServer(Thread):
         except KeyboardInterrupt:
             self.conn.close()
             break
+        except:
+            self.conn.decon()
+            time.sleep(2)
+            self.conn.irc = self.conn.connect()
         for i in dataN.splitlines():
           try:
               if i.split()[0] == 'PING':
