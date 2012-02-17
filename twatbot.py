@@ -103,17 +103,29 @@ class WhoThread(Thread):
     def run(self):
         for i in self.conn.chans:
             self.conn.ircCom('WHO',i)
-
+class DoublesThread(Thread):
+    def __init__(self):
+        self.count = 0
+        Thread.__init__(self)
+    def run(self):
+        while True:
+            self.count += random.randint(1,10)
+            if self.count >= 10000:
+                self.count = 0
+            time.sleep(1)
+            
+dubs = DoublesThread()
+dubs.start()
 class Connection:
     """A class to hold the connection to the server
     and related information"""
     def __init__(self,server,channels,port = 6667,nick='TwatBot'):
         self.msgQueue = Queue()
         self.disp = Thread(target=self.dispatcher)
-        self.disp.daemon = True
         self.disp.start()
+        self.dubs = dubs
         self.quitting = False
-        self.printAll = False
+        self.printAll = True
         self.server = server.lower()
         self.port = port
         self.nick = nick
@@ -154,7 +166,7 @@ class Connection:
             if result == 0:
                 print 'Send timeout'
             else:
-                print i
+                print item
             
           except :
           #  print str(e)
@@ -216,9 +228,9 @@ class Connection:
         print str(e)
     def close(self): 
         self.ircCom('QUIT',":I don't quit, I wait")
+        self.decon() 
         time.sleep(2)
         print ('Exiting')
-        self.decon()
         try:
             listener.stop()
             logLock.acquire()
@@ -283,10 +295,11 @@ class ConnectionServer(Thread):
     while True:
         gc.collect()
         try:
+            
             dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
             if self.conn.printAll:
                 print dataN
-        except socket.timeout, e:
+        except (socket.timeout, socket.error), e:
             print str(e)
             self.conn.decon()
             time.sleep(2)
@@ -294,10 +307,6 @@ class ConnectionServer(Thread):
         except KeyboardInterrupt:
             self.conn.close()
             break
-        except:
-            self.conn.decon()
-            time.sleep(2)
-            self.conn.irc = self.conn.connect()
         for i in dataN.splitlines():
           try:
               if i.split()[0] == 'PING':
@@ -317,6 +326,8 @@ class ConnectionServer(Thread):
             continue
           self.conn.dataN = line(i)
           if not self.conn.dataN: continue
+          if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'][0] != '#':
+            self.conn.dataN['chan'] = self.conn.dataN['fool']
           parser.parse(self.conn)
           if "Ping timeout" in i and self.conn.nick in i and "ERROR" in i:
             self.conn.decon()

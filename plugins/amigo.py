@@ -113,18 +113,30 @@ def doubles(conn):
    cursor = db.cursor()
    try:
      if conn.dataN['words'][1]:
-       print "Getting user"
-       # Get the user specified
-       cursor.execute("SELECT * FROM doubles WHERE `nick` = '%s'" % (db.escape_string(conn.dataN['words'][1])))
-       x= cursor.fetchone()
-       if x:
-         print cursor._last_executed
-         print x
-         conn.sendMsg(conn.dataN['words'][1]+ ': Dubs:'+str(x[1])+ ' Trips:'+str(x[2])+' Quads:'+str(x[3])+ ' Misses:'+str(x[4]))
+       if conn.dataN['words'][1] == "top":
+           #print the top 3 users
+           cursor.execute("SELECT *  FROM doubles order by quads desc, trips desc, dubs desc, misses desc limit 0,3")
+           conn.sendMsg("Top doubles users are: ")
+           for i in cursor.fetchall():
+            conn.sendMsg(i[0]+': Dubs:'+str(i[1])+ ' Trips:'+str(i[2])+' Quads:'+str(i[3])+ ' Misses:'+str(i[4]))
+       elif conn.dataN['words'][1] == "losers":
+           cursor.execute("SELECT *  FROM doubles order by misses desc limit 0,3")
+           conn.sendMsg("Top losers users are: ")
+           for i in cursor.fetchall():
+            conn.sendMsg(i[0]+': Dubs:'+str(i[1])+ ' Trips:'+str(i[2])+' Quads:'+str(i[3])+ ' Misses:'+str(i[4]))
        else:
-         conn.sendMsg('No results for user')
+           print "Getting user"
+           # Get the user specified
+           cursor.execute("SELECT * FROM doubles WHERE `nick` = '%s'" % (db.escape_string(conn.dataN['words'][1])))
+           x= cursor.fetchone()
+           if x:
+             print cursor._last_executed
+             print x
+             conn.sendMsg(conn.dataN['words'][1]+ ': Dubs:'+str(x[1])+ ' Trips:'+str(x[2])+' Quads:'+str(x[3])+ ' Misses:'+str(x[4]))
+           else:
+             conn.sendMsg('No results for user')
    except IndexError:
-    n = str(random.randint(0,10000)).zfill(4)
+    n = str(conn.conn.dubs.count).zfill(4)
     count = 0
     for i in n[::-1]:
        if i == n[-1]:
@@ -134,6 +146,10 @@ def doubles(conn):
     out = {1:" ",2:", DOUBLES",3:", TRIPS",4:", QUADS"}[count]
     c = {1:'misses',2:'dubs',3:'trips',4:'quads'}[count]
     nick = db.escape_string(conn.dataN['fool'])
+    # if "noxialis" in conn.dataN['fool'].lower():
+        # if random.randint(0,2) == 0:
+            # conn.sendMsg("Critical error, scores reset")
+            # cursor.execute("DELETE FROM `doubles` WHERE `nick` = '"+nick+"';")
     vals = [nick,0,0,0,0]
     vals[count] = 1
     vals = str(tuple(vals))
@@ -146,6 +162,7 @@ def doubles(conn):
         conn.sendMsg("You rolled "+n+out)
     else:
         conn.sendNot("You rolled "+n+out)
+    
    
 def latin(conn):
     try:

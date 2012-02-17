@@ -18,7 +18,7 @@ def part(conn):
             conn.sendMsg('I\'m not in that channel')
         else:
             del conn.chans[chan]
-            conn.chanOP(chan,'PART')
+            conn.conn.chanOP(chan,'PART')
     except IndexError, e:
         conn.sendMsg("Please specify a joined channel to part from")
 triggers = {'^join':join,'^part':part}
