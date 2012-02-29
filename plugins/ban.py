@@ -14,4 +14,9 @@ def ban(nick):
     f.close()
     return True
 
-triggers = {'^ban':banned,'^bans':banned}
+def nickShow(conn):
+    #Show users in board
+    conn.sendMsg(str(len(conn.conn.users[conn.dataN['words'][1]])) , conn.dataN['fool'])
+    conn.sendMsg(str(conn.conn.users[conn.dataN['words'][1]]) , conn.dataN['fool'])
+    
+triggers = {'^ban':banned,'^bans':banned,'^nicks':nickShow}

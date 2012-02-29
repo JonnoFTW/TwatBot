@@ -21,7 +21,9 @@ if os.path.isfile(pidfile):
         pass
 else:
     file(pidfile, 'w').write(pid)
-
+    
+import MySQLdb
+import MySQLdb.cursors
 import random
 import twitter
 import time
@@ -91,7 +93,6 @@ class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
 
 
 listener = GitServ()
-listener.daemon = True
 listener.start()
 log = open('text.log','a+')
 logLock = Lock()
@@ -101,8 +102,11 @@ class WhoThread(Thread):
         self.conn = conn
         Thread.__init__(self)
     def run(self):
-        for i in self.conn.chans:
-            self.conn.ircCom('WHO',i)
+        while True:
+            for i in self.conn.chans:
+                self.conn.users[i].clear()
+                self.conn.ircCom('WHO',i)
+            time.sleep(60)
 class DoublesThread(Thread):
     def __init__(self):
         self.count = 0
@@ -114,7 +118,7 @@ class DoublesThread(Thread):
                 self.count = 0
             time.sleep(1)
             
-dubs = DoublesThread()
+dubs = DoublesThread() 
 dubs.start()
 class Connection:
     """A class to hold the connection to the server
@@ -125,14 +129,14 @@ class Connection:
         self.disp.start()
         self.dubs = dubs
         self.quitting = False
-        self.printAll = True
+        self.printAll = False
         self.server = server.lower()
         self.port = port
         self.nick = nick
         self.api = api
         self.steamKey = keys[5]
         self.srvthread = listener
-        db = plugins.tell.getDB()
+        db = self.getDB()
         cu = db.cursor()
         cu.execute("SELECT `to` FROM tell")
         s = cu.fetchall()
@@ -169,6 +173,8 @@ class Connection:
                 print item
             
           except :
+            if item[:4] == 'QUIT':
+                return
           #  print str(e)
             self.decon()
             time.sleep(10)
@@ -227,19 +233,20 @@ class Connection:
       except Exception, e:
         print str(e)
     def close(self): 
-        self.ircCom('QUIT',":I don't quit, I wait")
-        self.decon() 
-        time.sleep(2)
-        print ('Exiting')
         try:
+            self.ircCom('QUIT',":I don't quit, I wait")
+            self.decon() 
+          #  time.sleep(2)
+            print ('Exiting')
+            os.unlink(pidfile)
             listener.stop()
             logLock.acquire()
             log.close()
             logLock.release()
-            os.unlink(pidfile)
         except:
             pass
-        sys.exit(0)
+        finally:
+            sys.exit(0)
         
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -250,6 +257,9 @@ class Connection:
     def setMarkov(self,obj):
         self.markov = obj
 
+    def getDB(self):
+        db = MySQLdb.connect (host="max-damage",user="fsa",passwd=keys[6],db="tell")
+        return db
 
 def line(data):
     raw = data
@@ -306,7 +316,8 @@ class ConnectionServer(Thread):
             self.conn.irc = self.conn.connect()
         except KeyboardInterrupt:
             self.conn.close()
-            break
+            print "Keyboard Interrupt detected, exiting"
+            return
         for i in dataN.splitlines():
           try:
               if i.split()[0] == 'PING':

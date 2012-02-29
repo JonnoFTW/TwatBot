@@ -87,7 +87,7 @@ def asl(conn):
    conn.sendMsg('/'.join([str(random.randint(8,30)),random.choice(['m','f']),random.choice(places)]))
 
 def flip(conn):
-   if random.randint(0,1):
+   if random.randint(0,1): 
       msg = 'Heads'
    else:
       msg = 'Tails'
@@ -109,7 +109,7 @@ def joke(conn):
       conn.sendMsg(i)
 
 def doubles(conn):
-   db = MySQLdb.connect (host="max-damage",user="fsa",passwd="^LkU!9BEd*4J&C2`Y6s.-=",db="tell")
+   db = conn.conn.getDB()
    cursor = db.cursor()
    try:
      if conn.dataN['words'][1]:
@@ -162,7 +162,16 @@ def doubles(conn):
         conn.sendMsg("You rolled "+n+out)
     else:
         conn.sendNot("You rolled "+n+out)
-    
+        
+def lines(conn):
+    db = MySQLdb.connect (host="max-damage",user="Twatbot",passwd="dicks",db="tell")
+    cursor = db.cursor()
+    try:
+        nick = conn.dataN['words'][1]
+    except IndexError:
+        nick = conn.dataN['fool']
+    cursor.execute("SELECT COUNT(`nick`) FROM `logs` WHERE `nick` = '%s'" % (db.escape_string(nick)))
+    conn.sendMsg("Lines from "+nick+": "+str(cursor.fetchone()[0]))
    
 def latin(conn):
     try:
@@ -181,6 +190,7 @@ def latin(conn):
       
 triggers = { '^fortune':fortune,
              '^uname':uname,
+             '^lines':lines,
              '^time':ti,
              '^w':w,
              '^uuid':uid,

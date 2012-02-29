@@ -3,9 +3,6 @@ import MySQLdb
 import MySQLdb.cursors
 help = "^tell will private message the given person whenever and whereever it sees them again. use ^read to read any message you may have"
 
-def getDB():
-    db = MySQLdb.connect (host="max-damage",user="Twatbot",passwd="dicks",db="tell")
-    return db
 
 def addTell(conn):
     """
@@ -15,7 +12,7 @@ def addTell(conn):
         - Table tell- (PK)msgId,to(nick),message,time,sender(nick)
     """
     try:
-      db = getDB()
+      db = conn.conn.getDB()
       cursor = db.cursor()
       cursor.execute("""INSERT INTO tell (`to`,message,time,sender)
                      VALUES (%s,%s,NOW(),%s)""",
@@ -30,10 +27,10 @@ def addTell(conn):
       conn.sendMsg("Usage: ^tell <to> <message>")
     finally:
       cursor.close()
-      db.close()
+      db.close() 
 def getTell(conn):
     try:
-      db = getDB()
+      db = conn.conn.getDB()
       cursor = db.cursor()
       cursor.execute("""SELECT tell.sender, tell.message, tell.time
                         FROM tell WHERE `to` = %s

@@ -80,11 +80,11 @@ class PluginRunner(Thread):
         self.plugin = plugin
         Thread.__init__(self)
     def run(self):
-        if self.conn.dataN['fool'] in (self.conn.ignores + self.conn.banned):
-            return
         try:
             if self.plugin == default:
                 self.plugin.default(self.conn)
+            elif self.conn.dataN['fool'] in (self.conn.ignores + self.conn.banned):
+                return
             else:
                 self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:

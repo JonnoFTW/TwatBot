@@ -10,7 +10,7 @@ def default(conn):
 #    print conn.dataN
     if pieces[1] == "352":
         try:
-            conn.conn.users[pieces[3]].add(pieces[7])
+            conn.conn.users[pieces[3]].add(pieces[-1])
         except:
             print conn.dataN
     #handle all other messages
@@ -20,6 +20,8 @@ def default(conn):
     if conn.dataN['cmd'] == "PRIVMSG":
         cleaned = regex.sub("",conn.dataN['msg'])
       #100% MAVERICK  print cleaned
+        if not conn.dataN['words']:
+            return
         if conn.dataN['chan'] in conn.conn.chans:
             c = 0
             for i in conn.conn.users[conn.dataN['chan']]:
