@@ -1,7 +1,8 @@
 import json
+import re
 from urllib2 import urlopen
-import MySQLdb
-import MySQLdb.cursors
+from urllib  import quote
+
 
 help = "^steam <steamid> will get userinfo for the user" 
 
@@ -10,24 +11,26 @@ def steam(conn):
     db = conn.conn.getDB() 
     c = db.cursor()
     try:
-        #An id was provided
+        #An id or nick was provided
         id = conn.dataN['words'][1]
         #Check if the is in the db
-        print repr(db.escape_string(id)) 
-        c.execute("SELECT steamId from steamId WHERE `nick` = '"+(db.escape_string(id))+"'")
-        x = c.fetchone()
+        x = conn.getName('steamId')
         if x:
-            id = x[0]
+            id = x
+        else:
+            #Perhaps they are providing a user name?
+            s = re.compile('var\sajaxFriendUrl\s\=\s\"http\:\/\/steamcommunity\.com\/actions\/AddFriendAjax\/(\d+)\"\;')
+            try:
+                f = urlopen("http://steamcommunity.com/id/"+quote(id)).read()
+                id = s.findall(f)[0]
+            except HTTPError:
+                conn.sendMsg("No such user by that name")
+                return
+                
     except IndexError:
         #No id, perhaps they are stored
-        print "Using nick as steam name"
-
-        c.execute("SELECT steamId FROM steamId WHERE `nick` = '"+ db.escape_string(conn.dataN['fool'])+"';")
-        print c._last_executed
-        x = c.fetchone()
-        if x:
-            id = str(x[0])
-        else:
+        id = conn.getName('steamId')
+        if not id:
             conn.sendMsg("No steamId associated with this nick. Use ^setsteam <steamId> to associate your nick with a given steamId")
             return
     except:
@@ -60,22 +63,15 @@ def steam(conn):
     f = json.load(urlopen("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key="+key+"&steamids="+(','.join(friends))))
     friends = []
     for i in f["response"]["players"]:
-        friends.append(i["personaname"])
+        friends.append(i["steamid"])
     conn.sendMsg("User: %s, Realname: %s, Country: %s, Playing: %s, Clan: %s, Friends: [%s]"%
                  (p["personaname"],name,p["loccountrycode"],game,clan,'; '.join(friends[:10])))
 
 def setsteam(conn):
     #Associate a nick with a steam id for later use
     try:
-        db = conn.conn.getDB()
-        steamId = db.escape_string(conn.dataN['words'][1])
-        nick = db.escape_string(conn.dataN['fool'])
-        c = db.cursor()
-        vals = [nick,steamId]
-        vals = str(tuple(vals))
-        c.execute("""INSERT INTO `steamId` (`nick`,`steamId`) VALUES %s 
-                     ON DUPLICATE KEY UPDATE `steamId` = %s;""" % (vals,steamId))
-        conn.sendMsg("Set steam for nick "+nick+", use ^steam to view your stats")
-    except IndexError, e:
-        conn.sendMsg('^setSteam <steamId>. Associates a steamId with your nick to get your details from')
+        conn.setName('steamId')
+    except IndexError:
+        conn.sendMsg('Please provide a steamId to associate your nick with')
+        
 triggers = {"^steam":steam,'^setsteam':setsteam}

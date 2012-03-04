@@ -5,19 +5,30 @@ triggers = {}
 regex = re.compile("\x03(?:\d{1,2}(?:,\d{1,2})?)?", re.UNICODE)
 import cPickle
 def default(conn):
+    if conn.conn.printAll:
+        print conn.dataN
     #Handle 352
     pieces = conn.dataN['raw'].split()
 #    print conn.dataN
     if pieces[1] == "352":
-        try:
-            conn.conn.users[pieces[3]].add(pieces[-1])
+        try:    
+            print "Adding user: %s" % (pieces[7])
+            conn.conn.users[pieces[3]].add(pieces[7]) 
         except:
-            print conn.dataN
+        
+            print "Error adding user, ",conn.dataN
     #handle all other messages
+    elif conn.dataN['cmd'] == "JOIN":
+        print "A user joined:"+conn.dataN['fool']
+        conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
+    elif conn.dataN['cmd'] == "PART":
+        print "A user left: "+conn.dataN['fool']
+        conn.conn.users[conn.dataN['chan']].remove(conn.dataN['fool'])
+
     # Handle privmsg
-    if '^¬ Œ‘€‚ÍÓÙ˚????????????????????????????????????????????????????????????????????' in conn.dataN['msg']:
+    elif '^¬ Œ‘€‚ÍÓÙ˚????????????????????????????????????????????????????????????????????' in conn.dataN['msg']:
         conn.sendMsg(" ".join(['ban',conn.dataN['chan'],conn.dataN['fool'],'SUCH AN EDGY AND HIP HACKER']),'chanserv')
-    if conn.dataN['cmd'] == "PRIVMSG":
+    elif conn.dataN['cmd'] == "PRIVMSG":
         cleaned = regex.sub("",conn.dataN['msg'])
       #100% MAVERICK  print cleaned
         if not conn.dataN['words']:

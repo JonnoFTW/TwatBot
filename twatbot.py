@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 # coding=utf-8
 import socket
-import os
+import os,signal
 import sys, traceback
 import gc
 from Queue import Queue
@@ -40,16 +40,21 @@ def getFile(x):
         result = f.readlines()
         result = map(lambda x: x.rstrip('\n'),result)
         return result
-keys = getFile('keys')
+keys = dict()
 
+with open('keys') as f:
+    for i in f.read().splitlines():
+        j = i.split()
+        keys[j[0]] = j[1]
+        
 api = twitter.Api(
-    keys[0],
-    keys[1],
-    keys[2],
-    keys[3]
+    keys['consumer_key'],
+    keys['consumer_secret'],
+    keys['access_token_key'],
+    keys['access_token_secret']
     )
 
-print (api.VerifyCredentials())
+#print (api.VerifyCredentials())
 
 servers = [
  {'server': 'irc.rizon.net',
@@ -77,19 +82,19 @@ class GitHandler(SocketServer.StreamRequestHandler):
             connections[0].conn.sendMsg(data,"#perwl")    
       except Exception, e:
         print >> sys.stderr, str(e)
+        
 class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
    def __init__(self):
      try:
         self.server = SocketServer.TCPServer(("localhost",6666),GitHandler)
-        #self.server.setsockopt(SOL_SOCKET,SO_REUSEADDR,1)
         Thread.__init__(self)
      except Exception, e:
         print >> sys.stderr, str(e)
    def run(self):
         self.server.serve_forever()
    def stop(self):
+        print "Stopping gitserv listener"
         self.server.shutdown()
-        #self.server.close()
 
 
 listener = GitServ()
@@ -102,11 +107,11 @@ class WhoThread(Thread):
         self.conn = conn
         Thread.__init__(self)
     def run(self):
-        while True:
+      #  while True: 
             for i in self.conn.chans:
                 self.conn.users[i].clear()
                 self.conn.ircCom('WHO',i)
-            time.sleep(60)
+       #     time.sleep(60)
 class DoublesThread(Thread):
     def __init__(self):
         self.count = 0
@@ -134,7 +139,7 @@ class Connection:
         self.port = port
         self.nick = nick
         self.api = api
-        self.steamKey = keys[5]
+        self.steamKey = keys['steam_api_key']
         self.srvthread = listener
         db = self.getDB()
         cu = db.cursor()
@@ -160,6 +165,7 @@ class Connection:
         self.uptime = datetime.datetime.now()
         self.who = WhoThread(self)
         self.who.start()
+        self.keys = keys
         
     def dispatcher(self):
         while True:
@@ -219,7 +225,7 @@ class Connection:
       finally:
         self.ircCom ('NICK',self.nick)
         self.ircCom ('USER',self.nick + ' x * :Segwinton Buttsworthy')
-        self.sendMsg('identify '+keys[4],'nickserv')
+        self.sendMsg('identify '+keys['nickpass'],'nickserv')
         time.sleep(4)
         for i in self.chans.keys():
             self.joinChan(i)
@@ -234,19 +240,19 @@ class Connection:
         print str(e)
     def close(self): 
         try:
-            self.ircCom('QUIT',":I don't quit, I wait")
+            self.ircCom("QUIT",":I don't quit, I wait")
+            self.quitting = True
+            time.sleep(2)
             self.decon() 
-          #  time.sleep(2)
-            print ('Exiting')
+            print 'Removing pid file'
             os.unlink(pidfile)
+            print "Stopping listener"
             listener.stop()
-            logLock.acquire()
-            log.close()
-            logLock.release()
-        except:
-            pass
-        finally:
-            sys.exit(0)
+            print "Listener stopped"
+            print "Killing process"
+            os.kill(os.getpid(), signal.SIGINT)
+        except Exception, e:
+            print 'An exception occured:',e
         
     def joinChan(self,chan):
         self.ircCom('JOIN',chan)
@@ -258,7 +264,7 @@ class Connection:
         self.markov = obj
 
     def getDB(self):
-        db = MySQLdb.connect (host="max-damage",user="fsa",passwd=keys[6],db="tell")
+        db = MySQLdb.connect (host="max-damage",user="fsa",passwd=keys['mysql_pass'],db="tell")
         return db
 
 def line(data):
@@ -266,7 +272,6 @@ def line(data):
     try:
         if data.split()[0] == "ERROR":
             return None
-        
         data = data.rstrip('\r\n').split()
         fool = data[0].split('!')[0][1:]
         cmd  = data[1]
@@ -303,76 +308,80 @@ class ConnectionServer(Thread):
         self.conn = Connection(server,channels,port,nick)
   def run(self):
     while True:
+        if self.conn.quitting:
+            print "Quitting forever"
+            sys.exit(0)
         gc.collect()
         try:
-            
-            dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
-            if self.conn.printAll:
-                print dataN
-        except (socket.timeout, socket.error), e:
-            print str(e)
-            self.conn.decon()
-            time.sleep(2)
-            self.conn.irc = self.conn.connect()
-        except KeyboardInterrupt:
-            self.conn.close()
-            print "Keyboard Interrupt detected, exiting"
-            return
-        for i in dataN.splitlines():
-          try:
-              if i.split()[0] == 'PING':
-                self.conn.ircCom('PONG', i.split(':')[1])
-                continue
-          except IndexError:
-            return
-          except Exception, e:
-            if self.conn.quitting:
-                os.unlink(pidfile)
-                listener.stop()
-                sys.exit(0)
-            print >> sys.stderr, str(e)
-            self.conn.decon()
-            time.sleep(2)
-            self.conn.irc = self.conn.connect()
-            continue
-          self.conn.dataN = line(i)
-          if not self.conn.dataN: continue
-          if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'][0] != '#':
-            self.conn.dataN['chan'] = self.conn.dataN['fool']
-          parser.parse(self.conn)
-          if "Ping timeout" in i and self.conn.nick in i and "ERROR" in i:
-            self.conn.decon()
-            time.sleep(5)
-            self.conn.connect()
-            break
-          if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'] in self.conn.chans.keys() or self.conn.dataN['chan'] == self.conn.nick:
             try:
-                if self.conn.dataN['fool'] in self.conn.admins:
-                  try:
-                    if len(self.conn.dataN['words']) > 0 and self.conn.dataN['words'][0] == '^connect':
-                      connections.append(ConnectionServer(self.conn.dataN['words'][1],[self.conn.dataN['words'][2]],nick='Tw4tb0t'))
-                      if connections[-1].m == 1:
-                        self.conn.sendMsg("Successfully connected")
-                        connections[-1].start()
-                      else:
-                        self.conn.sendMsg("A connection to that server already exists!")
-                  except IndexError,e :
-                    self.conn.sendMsg("Usage is: ^connect server channel")
-                if self.conn.dataN['words'][0][0] != '^':
-                    if self.conn.dataN['msg'].find('http') == -1 and self.conn.dataN['msg'].count('.') < 8:
+                
+                dataN = self.conn.irc.recv(4096)# .decode('utf-8','ignore')
+                if self.conn.printAll:
+                    print dataN
+            except (socket.timeout, socket.error), e:
+                print str(e)
+                self.conn.decon()
+                time.sleep(2)
+                self.conn.irc = self.conn.connect()
+            except KeyboardInterrupt:
+                self.conn.close()
+                print "Keyboard Interrupt detected, exiting"
+                return
+            for i in dataN.splitlines():
+              try:
+                  if i.split()[0] == 'PING':
+                    self.conn.ircCom('PONG', i.split(':')[1])
+                    continue
+              except IndexError:
+                return
+              except Exception, e:
+                print >> sys.stderr, str(e)
+                self.conn.decon()
+                time.sleep(2)
+                self.conn.irc = self.conn.connect()
+                continue
+              self.conn.dataN = line(i)
+              if not self.conn.dataN: continue
+              if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'][0] != '#':
+                self.conn.dataN['chan'] = self.conn.dataN['fool']
+              parser.parse(self.conn)
+              if "Ping timeout" in i and self.conn.nick in i and "ERROR" in i:
+                self.conn.decon()
+                time.sleep(5)
+                self.conn.connect()
+                break
+              if self.conn.dataN['cmd'] == 'PRIVMSG' and self.conn.dataN['chan'] in self.conn.chans.keys() or self.conn.dataN['chan'] == self.conn.nick:
+                try:
+                    if self.conn.dataN['fool'] in self.conn.admins:
                       try:
-                        logLock.acquire()
-                        log.write(self.conn.dataN['msg']+'\n')
-                        logLock.release()
-                      except Exception, e:
-                        print e
-                    if self.conn.dataN['chan'] != self.conn.nick and self.conn.dataN['fool'] not in self.conn.ignores: self.conn.chans[self.conn.dataN['chan']].append(self.conn.dataN['fool']+': '+self.conn.dataN['msg'])
-            except IndexError:
-                pass
+                        if len(self.conn.dataN['words']) > 0 and self.conn.dataN['words'][0] == '^connect':
+                          connections.append(ConnectionServer(self.conn.dataN['words'][1],[self.conn.dataN['words'][2]],nick='Tw4tb0t'))
+                          if connections[-1].m == 1:
+                            self.conn.sendMsg("Successfully connected")
+                            connections[-1].start()
+                          else:
+                            self.conn.sendMsg("A connection to that server already exists!")
+                      except IndexError,e :
+                        self.conn.sendMsg("Usage is: ^connect server channel")
+                    if self.conn.dataN['words'][0][0] != '^':
+                        if self.conn.dataN['msg'].find('http') == -1 and self.conn.dataN['msg'].count('.') < 8:
+                          try:
+                            logLock.acquire()
+                            log.write(self.conn.dataN['msg']+'\n')
+                            logLock.release()
+                          except Exception, e:
+                            print e
+                        if self.conn.dataN['chan'] != self.conn.nick and self.conn.dataN['fool'] not in self.conn.ignores: self.conn.chans[self.conn.dataN['chan']].append(self.conn.dataN['fool']+': '+self.conn.dataN['msg'])
+                except IndexError:
+                    pass
+        except:
+            pass
             
 connections = []
 for i in servers:
     connections.append(ConnectionServer(i['server'],i['channels']))
 for i in connections:
-    i.start()                
+    i.start()        
+for i in connections:
+    i.join()
 

@@ -4,7 +4,8 @@ from heapq import merge
 import traceback
 import sys, os
 from threading import Thread
-
+import MySQLdb
+import MySQLdb.cursors
         
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
@@ -73,7 +74,10 @@ class ircState:
         self.conn.joinChan(chan)
     def close(self):
         self.conn.close()
-    
+    def setName(self,field):   
+        return names.setName(self.conn,field)
+    def getName(self,field):
+        return names.getName(self.conn,field)
 class PluginRunner(Thread):
     def __init__(self,conn,plugin):
         self.conn = ircState(conn)
@@ -89,9 +93,12 @@ class PluginRunner(Thread):
                 self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
         except Exception, err:
             print >> sys.stderr, str(err)
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
+           # exc_type, exc_obj, exc_tb = sys.exc_info()
+           # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+           # self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
+            fln = traceback.format_exc().splitlines()
+            print fln
+            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5])) )
         
 def check(pl,conn):
     for plugin in pl:
@@ -121,6 +128,7 @@ pluginList = [
     tweet,
     checkem,
     markov,
+    lastfm,
 #    laughter,
     fullwidth,
     counterstrike,
