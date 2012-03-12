@@ -19,10 +19,10 @@ def default(conn):
             print "Error adding user, ",conn.dataN
     #handle all other messages
     elif conn.dataN['cmd'] == "JOIN":
-        print "A user joined:"+conn.dataN['fool']
+        print "A user joined "+conn.dataN['chan']+": "+conn.dataN['fool']
         conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
     elif conn.dataN['cmd'] == "PART":
-        print "A user left: "+conn.dataN['fool']
+        print "A user left: "+conn.dataN['chan']+": "+conn.dataN['fool']
         conn.conn.users[conn.dataN['chan']].remove(conn.dataN['fool'])
 
     # Handle privmsg
@@ -51,7 +51,18 @@ def default(conn):
                 
                 conn.sendMsg(" ".join(["ban",conn.dataN['chan'],conn.dataN['fool'],random.choice(msgs)]),'chanserv')
         if conn.dataN['fool'] in conn.conn.admins:
-            if conn.dataN['words'][0] == "^nazi":
+            cmd = conn.dataN['words'][0]
+            if cmd == '^nick':
+                try:
+                    nick = conn.dataN['words'][1]
+                    conn.conn.ircCom('NICK',conn.dataN['words'][1])
+                    conn.sendMsg("Nick set to "+nick)
+                except IndexError:
+                    conn.sendMsg("Please specify a nick to use")
+            elif cmd == '^log':
+                conn.conn.printAll = not conn.conn.printAll
+                conn.sendMsg("Logging is now: "+str(conn.conn.printAll))
+            elif cmd == "^nazi":
               try:
                 if conn.dataN['words'][1] == "on":
                   conn.conn.nazi = True

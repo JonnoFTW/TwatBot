@@ -187,7 +187,20 @@ def latin(conn):
       conn.sendMsg("Loaded phrases")
       pkl.close()
       latin(conn)
-      
+def genre(conn):
+    prefixes = ['','post','indie','avant-garde','nautical','break','wub','chip','vintage','classic','virtuosic','death','instrumental','british','industrial','thrash','japanese','J','K','acoustic','progressive','power','glam','melodic','new wave','german','gothic','symphonic','grind','synth','minimal','psychedelic','brutal','sexy','easy listening','christian','anime','stoner','comedy','sad','christmas','neo','russian','finnish','summer','underground','dream','pagan','minimal','ambient','nu','speed','contemporary','alt','acid','english','kvlt','cult','mu','raw','norwegian','viking','porn']
+    suffixes = ['core','','step','groove','noise']
+    gens = ['folk','ambient','electronica','funk','hip-hop','dance','pop','trance','indie','soul','hard','lounge','blues','classical','grunge','/mu/core','emo','rap','rock','punk','alternative','nautical','electro','swing','screamo','jazz','reggae','metal','classical','math','nerd','country','western','dub',"drum 'n' bass",'celtic','shoegaze']
+    x = random.choice(prefixes)
+    if x:
+        x +='-'
+        if random.randint(0,2) == 1:
+            x += random.choice(prefixes)+'-'
+    x += random.choice(gens)
+    if random.randint(0,3) == 1:
+        x += random.choice(suffixes)
+    
+    conn.sendMsg(x)
 triggers = { '^fortune':fortune,
              '^uname':uname,
              '^lines':lines,
@@ -206,6 +219,7 @@ triggers = { '^fortune':fortune,
              '^joke':joke,
              '^flip':flip,
              '^doubles':doubles,
-             '^latin':latin
+             '^latin':latin,
+             '^genre':genre
 }
     

@@ -58,7 +58,7 @@ api = twitter.Api(
 
 servers = [
  {'server': 'irc.rizon.net',
-  'channels':['#perwl','#futaba']
+  'channels':["#perwl",'#futaba','#touhouradio']
   }
  ]
 
@@ -107,10 +107,11 @@ class WhoThread(Thread):
         self.conn = conn
         Thread.__init__(self)
     def run(self):
+        print "finished"
       #  while True: 
-            for i in self.conn.chans:
-                self.conn.users[i].clear()
-                self.conn.ircCom('WHO',i)
+        #    for i in self.conn.chans:
+        #        self.conn.users[i].clear()
+        #        self.conn.ircCom('WHO',i)
        #     time.sleep(60)
 class DoublesThread(Thread):
     def __init__(self):
@@ -134,7 +135,7 @@ class Connection:
         self.disp.start()
         self.dubs = dubs
         self.quitting = False
-        self.printAll = False
+        self.printAll = True
         self.server = server.lower()
         self.port = port
         self.nick = nick
@@ -176,8 +177,7 @@ class Connection:
             if result == 0:
                 print 'Send timeout'
             else:
-                print item
-            
+                print 'Sending:',item.strip()
           except :
             if item[:4] == 'QUIT':
                 return
@@ -258,7 +258,7 @@ class Connection:
         self.ircCom('JOIN',chan)
         self.chans[chan] = deque([],10)
         self.users[chan] = set()
-        self.ircCom('WHO',chan)
+      #  self.ircCom('WHO',chan)
 
     def setMarkov(self,obj):
         self.markov = obj

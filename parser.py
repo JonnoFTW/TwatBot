@@ -97,7 +97,7 @@ class PluginRunner(Thread):
            # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
            # self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
             fln = traceback.format_exc().splitlines()
-            print fln
+          #  print fln
             self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5])) )
         
 def check(pl,conn):
