@@ -47,18 +47,23 @@ with open('keys') as f:
         j = i.split()
         keys[j[0]] = j[1]
         
-api = twitter.Api(
-    keys['consumer_key'],
-    keys['consumer_secret'],
-    keys['access_token_key'],
-    keys['access_token_secret']
-    )
+
 
 #print (api.VerifyCredentials())
 
 servers = [
  {'server': 'irc.rizon.net',
-  'channels':["#perwl",'#futaba','#touhouradio']
+  'channels':["#perwl",'#futaba','#touhouradio'],
+  'admins':["Garfunk",'Jonno_FTW','Garfunkel'],
+  'nick': 'TwatBot',
+  'messages':[]
+  },
+  {
+  'server': 'irc.awesome-hd.net',
+  'channels': [],
+  'admins':['PuddingParty'],
+  'nick':'PuddingBot',
+  'messages':[{'to':'AHDBot','msg':'enter #awesome-hd puddingparty abc123'}]
   }
  ]
 
@@ -94,13 +99,21 @@ class GitServ(Thread): #SocketServer.ThreadingMixIn,SocketServer.TCPServer):
         self.server.serve_forever()
    def stop(self):
         print "Stopping gitserv listener"
-        self.server.shutdown()
+       # self.server.shutdown()
+        print "Giteserv stopped (not really, shutdown wasn't called)"
 
 
 listener = GitServ()
 listener.start()
 log = open('text.log','a+')
 logLock = Lock()
+
+api = twitter.Api(
+    keys['consumer_key'],
+    keys['consumer_secret'],
+    keys['access_token_key'],
+    keys['access_token_secret']
+    )
 
 class WhoThread(Thread):
     def __init__(self,conn):
@@ -109,16 +122,20 @@ class WhoThread(Thread):
     def run(self):
         print "finished"
       #  while True: 
-        #    for i in self.conn.chans:
-        #        self.conn.users[i].clear()
-        #        self.conn.ircCom('WHO',i)
-       #     time.sleep(60)
+        for i in self.conn.chans:
+            self.conn.users[i].clear()
+            self.conn.ircCom('WHO',i)
+            time.sleep(30)
+                
 class DoublesThread(Thread):
     def __init__(self):
         self.count = 0
+        self.stop = False
         Thread.__init__(self)
     def run(self):
         while True:
+            if self.stop:
+                return
             self.count += random.randint(1,10)
             if self.count >= 10000:
                 self.count = 0
@@ -129,19 +146,20 @@ dubs.start()
 class Connection:
     """A class to hold the connection to the server
     and related information"""
-    def __init__(self,server,channels,port = 6667,nick='TwatBot'):
+    def __init__(self,server,channels,port = 6667,nick='TwatBot',admins = [],messages = []):
+        self.connections = connections
         self.msgQueue = Queue()
         self.disp = Thread(target=self.dispatcher)
         self.disp.start()
         self.dubs = dubs
         self.quitting = False
-        self.printAll = True
+        self.printAll = False
+        self.debug = False
         self.server = server.lower()
         self.port = port
         self.nick = nick
         self.api = api
         self.steamKey = keys['steam_api_key']
-        self.srvthread = listener
         db = self.getDB()
         cu = db.cursor()
         cu.execute("SELECT `to` FROM tell")
@@ -152,7 +170,7 @@ class Connection:
         print self.tells
         cu.close()
         db.close()
-        self.admins = ['Jonno_FTW','Garfunkel',"Garfunk"]
+        self.admins = admins
         self.nazi = False
         self.chans = dict()
         for i in channels:
@@ -164,10 +182,15 @@ class Connection:
         self.ignores = getFile('ignore')
         self.irc = self.connect()
         self.uptime = datetime.datetime.now()
+        #self.who = WhoThread(self)
+        #self.who.start()
+        self.keys = keys
+        for i in messages:
+            self.sendMsg(i['msg'],i['to'])
+    
+    def whoInit(self):
         self.who = WhoThread(self)
         self.who.start()
-        self.keys = keys
-        
     def dispatcher(self):
         while True:
           try:
@@ -249,6 +272,8 @@ class Connection:
             print "Stopping listener"
             listener.stop()
             print "Listener stopped"
+            dubs.stop = True
+            print "Killed dubs thread"
             print "Killing process"
             os.kill(os.getpid(), signal.SIGINT)
         except Exception, e:
@@ -297,15 +322,16 @@ def line(data):
     return dic
     
 class ConnectionServer(Thread):
-  def __init__(self,server,channels,port = 6667,nick = 'TwatBot'):
+  def __init__(self,server,channels,port = 6667,nick = 'TwatBot',admins = [],messages = []):
       Thread.__init__(self)
+      self.server = server
       self.m = 1
       for i in connections:
         if i.conn.server == server:
           self.m = 0
           break
       if self.m != 0:
-        self.conn = Connection(server,channels,port,nick)
+        self.conn = Connection(server,channels,port,nick,admins,messages)
   def run(self):
     while True:
         if self.conn.quitting:
@@ -379,9 +405,7 @@ class ConnectionServer(Thread):
             
 connections = []
 for i in servers:
-    connections.append(ConnectionServer(i['server'],i['channels']))
+    connections.append(ConnectionServer(i['server'],i['channels'],admins = i['admins'],nick = i['nick'],messages = i['messages']))
 for i in connections:
-    i.start()        
-for i in connections:
-    i.join()
+    i.start()  
 

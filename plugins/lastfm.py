@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from urllib2 import urlopen
-from urllib  import quote, quote_plus
+from urllib  import quote, quote_plus, urlencode
 import json
 
 help = "Various functions for last.fm. Use ^np <user> to get a users last played track." 
@@ -27,30 +27,28 @@ def np(conn):
     except KeyError:
         conn.sendMsg("No user by that name")
         return
-    try:
-        url = "http://ws.audioscrobbler.com/2.0/?method=track.gettoptags&autocorrect=1&format=json&track="+quote_plus(track['name'].encode("utf-8"))+"&artist="+quote_plus(track['artist']['#text'].encode("utf-8"))+"&album="+quote_plus(track['album']['#text'].encode("utf-8"))+"&api_key="+key
-    except KeyError:
-        conn.sendMsg("Can't decode runes")
-        return
-   # print url
-    try:
-        t = json.load(urlopen(url))
-    except:
-        conn.sendMsg("An error occured getting the tags")
-    try:
-  #      print t
-        tags = ', '.join(map(lambda x:x['name'],t['toptags']['tag'][:5]))
-    except TypeError:
-        tags = t['toptags']['tag']['name']
-    except KeyError:
-        url = "http://ws.audioscrobbler.com/2.0/?method=artist.gettoptags&autocorrect=1&format=json&artist="+quote_plus(track['artist']['#text'].encode("utf-8"))+"&api_key="+key
-        t = json.load(urlopen(url))
-     #   print t
-        try:
-            tags = ', '.join(map(lambda x:x['name'],t['toptags']['tag'][:5]))
-        except KeyError:
-            tags = 'No tags available' 
-    conn.sendMsg("\0030,4Last.fm\003 User '%s' is now pegging to '%s' by '%s' from '%s', (%s)" % (name,track['name'],track['artist']['#text'],track['album']['#text'],tags)) 
+    urls = [{'method':'track.gettoptags',
+             'album':track['album']['#text'].encode("utf-8"),
+             'track':track['name'].encode("utf-8")
+             },
+            {'method':'artist.gettoptags'}]
+    for i in urls:
+        i['format'] = 'json'
+        i['autocorrect'] = 1
+        i['artist'] =  track['artist']['#text'].encode("utf-8")
+        i['api_key'] = key
+    tags = []
+    for url in urls:
+      try:
+          t = json.load(urlopen("http://ws.audioscrobbler.com/2.0/?"+urlencode(url)))
+          tags = ', '.join(map(lambda x:x['name'],t['toptags']['tag'][:5]))
+          break
+      except (TypeError, KeyError):
+          tags = 'No tags available' 
+          continue
+    if track['album']['#text']:
+        track['album']['#text'] = " from '"+ track['album']['#text']+"'"
+    conn.sendMsg("\0030,4Last.fm\003 User '%s' is now pegging to '%s' by '%s'%s, (%s)" % (name,track['name'],track['artist']['#text'],track['album']['#text'],tags)) 
 
 def setlastfm(conn):
     #Associate your nick with a username

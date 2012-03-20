@@ -6,10 +6,10 @@ import sys, os
 from threading import Thread
 import MySQLdb
 import MySQLdb.cursors
+from urllib2 import URLError
         
 def parse(conn):
     exceptionType, exceptionValue, exceptionTraceback = sys.exc_info()
-    print (conn.dataN['fool']+' '+conn.server+'/'+conn.dataN['chan']+': '+conn.dataN['msg'])
     if conn.dataN['msg'] == "\001VERSION\001":
         conn.sendNotice('VERSION Twatbot, the tweeting bot 1.2',conn.dataN['fool'])
     if conn.dataN['msg'] == "\001PING\001":
@@ -60,6 +60,7 @@ class ircState:
         self.uptime = conn.uptime
         self.chans = conn.chans
         self.dataN = dict(conn.dataN)
+        self.server = conn.server
     def sendNotice(self,msg,fool):
         self.conn.sendNotice(msg,fool)
     def sendMsg(self,msg,chan = None):
@@ -85,12 +86,15 @@ class PluginRunner(Thread):
         Thread.__init__(self)
     def run(self):
         try:
+           # print (self.conn.dataN['fool']+' '+self.conn.server+'/'+self.conn.dataN['chan']+': '+self.conn.dataN['msg'])
             if self.plugin == default:
                 self.plugin.default(self.conn)
             elif self.conn.dataN['fool'] in (self.conn.ignores + self.conn.banned):
                 return
             else:
                 self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
+        except URLError, err :
+            conn.sendMsg("Plugin failed"+ self.plugin.__name__ + ': '+str(err))
         except Exception, err:
             print >> sys.stderr, str(err)
            # exc_type, exc_obj, exc_tb = sys.exc_info()
@@ -98,7 +102,11 @@ class PluginRunner(Thread):
            # self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
             fln = traceback.format_exc().splitlines()
           #  print fln
-            self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5])) )
+            debugMsg = "Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5]))
+            if self.conn.conn.debug:
+                self.conn.sendMsg(debugMsg)
+            else:
+                self.conn.sendMsg(debugMsg,self.conn.conn.admins[0])
         
 def check(pl,conn):
     for plugin in pl:

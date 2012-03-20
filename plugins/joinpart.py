@@ -21,4 +21,15 @@ def part(conn):
             conn.conn.chanOP(chan,'PART')
     except IndexError, e:
         conn.sendMsg("Please specify a joined channel to part from")
-triggers = {'^join':join,'^part':part}
+        
+def msg(conn):
+    try:
+        conn.conn.connections[int(conn.dataN['words'][1])].conn.sendMsg(' '.join(conn.dataN['words'][3:]),conn.dataN['words'][2])
+    except Exception, e:
+        conn.sendMsg("Usage is ^msg <serverId> <channel> <message>")
+def servers(conn):
+    names = []
+    for i in conn.conn.connections:
+        names.append(i.server)
+    conn.sendMsg('Current servers are: '+(', '.join(names)))
+triggers = {'^join':join,'^part':part,'^msg':msg,'^servers':servers}

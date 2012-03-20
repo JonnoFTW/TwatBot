@@ -25,7 +25,7 @@ def getName(conn,field):
     c.execute(query)
   #  print c._last_executed
     x = c.fetchone()
-    if x == None:
+    if x == None or x[0] == None:
         return conn.dataN['fool']
     else:
         return x[0]

@@ -4,6 +4,11 @@ import urllib2
 import json
 import xml.dom.minidom
 help = "^google <string> does a google search, ^urban <word> gets first urbandictionary def, ^weather <State> <Location> gets the weather from the BOM. Australia only!"
+
+def ip(conn):
+    if conn.dataN['fool'] in conn.conn.admins:
+        ip = urllib2.urlopen("http://api.externalip.net/ip/").read()
+        conn.sendNot(ip)
  
 def convert(s):
   s = s.replace("<b>",'\2')
@@ -121,5 +126,6 @@ triggers = {'^ud':urban,
             "^weather":weather,
             '^fmyl':fml,
             '^fb':openBook,
-            '^etym':etymology
+            '^etym':etymology,
+            '^ip':ip            
             }

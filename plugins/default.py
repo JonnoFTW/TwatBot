@@ -20,10 +20,16 @@ def default(conn):
     #handle all other messages
     elif conn.dataN['cmd'] == "JOIN":
         print "A user joined "+conn.dataN['chan']+": "+conn.dataN['fool']
-        conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
+        try:
+            conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
+        except KeyError:
+            conn.conn.users[conn.dataN['chan']] = set()
     elif conn.dataN['cmd'] == "PART":
-        print "A user left: "+conn.dataN['chan']+": "+conn.dataN['fool']
-        conn.conn.users[conn.dataN['chan']].remove(conn.dataN['fool'])
+        try:
+            print "A user left: "+conn.dataN['chan']+": "+conn.dataN['fool']
+            conn.conn.users[conn.dataN['chan']].remove(conn.dataN['fool'])
+        except KeyError:
+            pass
 
     # Handle privmsg
     elif '^¬ Œ‘€‚ÍÓÙ˚????????????????????????????????????????????????????????????????????' in conn.dataN['msg']:
@@ -59,9 +65,15 @@ def default(conn):
                     conn.sendMsg("Nick set to "+nick)
                 except IndexError:
                     conn.sendMsg("Please specify a nick to use")
+            elif cmd == "^who":
+                conn.sendMsg("Requesting users")
+                conn.conn.whoInit()
             elif cmd == '^log':
                 conn.conn.printAll = not conn.conn.printAll
                 conn.sendMsg("Logging is now: "+str(conn.conn.printAll))
+            elif cmd == '^debug':
+                conn.conn.debug = not conn.conn.debug
+                conn.sendMsg("Debugging is now: "+str(conn.conn.debug))
             elif cmd == "^nazi":
               try:
                 if conn.dataN['words'][1] == "on":
