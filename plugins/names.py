@@ -26,6 +26,8 @@ def getName(conn,field):
   #  print c._last_executed
     x = c.fetchone()
     if x == None or x[0] == None:
+        print "Using name: "+ conn.dataN['fool']
         return conn.dataN['fool']
     else:
+        print "Using name: "+x[0]
         return x[0]

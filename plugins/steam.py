@@ -39,6 +39,7 @@ def steam(conn):
     k = json.load(urlopen("http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key="+key+"&steamids="+id))
     if len(k['response']['players']) == 0:
         conn.sendMsg("No such user exists! Please specify a valid steamId ")
+        print k
         return
     p = k["response"]["players"][0]
     if "primaryclanid" in p:
