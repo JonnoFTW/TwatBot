@@ -143,6 +143,7 @@ class DoublesThread(Thread):
             
 dubs = DoublesThread() 
 dubs.start()
+
 class Connection:
     """A class to hold the connection to the server
     and related information"""
@@ -153,7 +154,7 @@ class Connection:
         self.disp.start()
         self.dubs = dubs
         self.quitting = False
-        self.printAll = False
+        self.printAll = True
         self.debug = False
         self.server = server.lower()
         self.port = port
@@ -200,7 +201,7 @@ class Connection:
             if result == 0:
                 print 'Send timeout'
             else:
-                print 'Sending:',item.strip()
+                print 'Sending on '+self.server+':',item.strip()
           except :
             if item[:4] == 'QUIT':
                 return
@@ -234,28 +235,29 @@ class Connection:
         self.ircCom('NOTICE '+self.dataN['fool']+ ' :',msg.rstrip('\r\n'))
  
     def connect(self): 
-     self.errs = 0
-     while True:
       try:
+        print "Connecting to %s:%d" % (self.server,self.port)
         self.irc = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
         self.irc.settimeout(300)
-        print "Connecting to %s:%d" % (self.server,self.port)
         self.irc.connect ((self.server,self.port))
-      except Exception, e:
-        print str(e)
-        time.sleep(10)
-        continue
-      finally:
         self.ircCom ('NICK',self.nick)
         self.ircCom ('USER',self.nick + ' x * :Segwinton Buttsworthy')
         self.sendMsg('identify '+keys['nickpass'],'nickserv')
-        time.sleep(4)
+        time.sleep(5)
         for i in self.chans.keys():
             self.joinChan(i)
         return self.irc
+      except socket.error, e:
+        self.irc.close() 
+        print "-------------socket error---------"
+        print str(e)
+        return False
+      except Exception, e:
+        self.irc.close()
+        print "general exception found"
+        print str(e)
+        return False
 
-    def chanOP(self,chan,op):
-        self.ircCom (op,chan)
     def decon(self):
       try:
         self.irc.close()
@@ -348,7 +350,11 @@ class ConnectionServer(Thread):
                 print str(e)
                 self.conn.decon()
                 time.sleep(2)
-                self.conn.irc = self.conn.connect()
+                self.conn.irc = False
+                while not self.conn.irc:
+                  time.sleep(30)
+                  print "Attempting to reconnect"
+                  self.conn.irc = self.conn.connect()
             except KeyboardInterrupt:
                 self.conn.close()
                 print "Keyboard Interrupt detected, exiting"

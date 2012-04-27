@@ -21,7 +21,8 @@ def default(conn):
     elif conn.dataN['cmd'] == "JOIN":
         print "A user joined "+conn.dataN['chan']+": "+conn.dataN['fool']
         try:
-            conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
+            if conn.dataN['fool']:
+                conn.conn.users[conn.dataN['chan']].add(conn.dataN['fool'])
         except KeyError:
             conn.conn.users[conn.dataN['chan']] = set()
     elif conn.dataN['cmd'] == "PART":
@@ -32,7 +33,7 @@ def default(conn):
             pass
 
     # Handle privmsg
-    elif '^ÂÊÎÔÛâêîôû????????????????????????????????????????????????????????????????????' in conn.dataN['msg']:
+    elif '^Ã‚ÃŠÃŽÃ”Ã›Ã¢ÃªÃ®Ã´Ã»????????????????????????????????????????????????????????????????????' in conn.dataN['msg']:
         conn.sendMsg(" ".join(['ban',conn.dataN['chan'],conn.dataN['fool'],'SUCH AN EDGY AND HIP HACKER']),'chanserv')
     elif conn.dataN['cmd'] == "PRIVMSG":
         cleaned = regex.sub("",conn.dataN['msg'])
@@ -41,9 +42,13 @@ def default(conn):
             return
         if conn.dataN['chan'] in conn.conn.chans:
             c = 0
+            detections = []
             for i in conn.conn.users[conn.dataN['chan']]:
                 if i in cleaned:
+                    detections.append(i)
                     c += 1
+            if detections:
+                print "Detected: "+(' '.join(detections))
             if c > 5:
                 msgs = ["100% MAVERICK",
                         "I TOLD YOU DAWG, I TOLD YOU ABOUT THE HERSY",

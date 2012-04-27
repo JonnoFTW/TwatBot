@@ -126,6 +126,7 @@ def check(pl,conn):
 pluginList = [
     web,
     stat,
+    mueval,
     amigo,
     ban,
     chans,
@@ -135,7 +136,7 @@ pluginList = [
     scroll,
     tweet,
     checkem,
-    markov,
+#    markov,
     lastfm,
 #    laughter,
     fullwidth,

@@ -33,7 +33,7 @@ def urban(conn):
       suggestions = map(lambda x: x['term'],(filter(lambda x: x['type'] == 'link',d['list'])))[:4]
       conn.sendMsg("Word is not defined. Perhaps you meant: "+(', '.join(suggestions)))  
     else:
-      conn.sendMsg(d['list'][int(i)]['definition']+'--- '+d['list'][int(i)]['example'])
+      conn.sendMsg((d['list'][int(i)]['definition']+'--- '+d['list'][int(i)]['example'])[:756])
   except IndexError, e:
     print e
     conn.sendMsg("Usage is: ^ud <word>")

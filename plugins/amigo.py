@@ -83,7 +83,7 @@ def hipster(conn):
    
 def asl(conn):
 #   conn.sendMsg('new behaviour!')
-   places = ['nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
+   places = ['sa','hawaii','israel','nigeria','aus','cali','nyc','nsw','fl','uk','france','russia','germany','japan','china','nz']
    conn.sendMsg('/'.join([str(random.randint(8,30)),random.choice(['m','f']),random.choice(places)]))
 
 def flip(conn):
