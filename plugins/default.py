@@ -12,10 +12,10 @@ def default(conn):
 #    print conn.dataN
     if pieces[1] == "352":
         try:    
-            print "Adding user: %s" % (pieces[7])
+       #     print pieces
+            print "Adding user to %s: %s" % (pieces[3],pieces[7])
             conn.conn.users[pieces[3]].add(pieces[7]) 
         except:
-        
             print "Error adding user, ",conn.dataN
     #handle all other messages
     elif conn.dataN['cmd'] == "JOIN":
@@ -48,7 +48,7 @@ def default(conn):
                     detections.append(i)
                     c += 1
             if detections:
-                print "Detected: "+(' '.join(detections))
+                print "Detected in "+conn.dataN['chan']+": "+(' '.join(detections))
             if c > 5:
                 msgs = ["100% MAVERICK",
                         "I TOLD YOU DAWG, I TOLD YOU ABOUT THE HERSY",

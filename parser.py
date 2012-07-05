@@ -47,7 +47,7 @@ def parse(conn):
             check(pluginList,conn)
     #everything else is passed to the default plugin
             
-    p = PluginRunner(conn,default)
+    p = Thread(target=PluginRunner,args=(conn,default),name="Default plugin runner")
     p.start()
     
 class ircState:
@@ -79,39 +79,40 @@ class ircState:
         return names.setName(self.conn,field)
     def getName(self,field):
         return names.getName(self.conn,field)
-class PluginRunner(Thread):
-    def __init__(self,conn,plugin):
-        self.conn = ircState(conn)
-        self.plugin = plugin
-        Thread.__init__(self)
-    def run(self):
-        try:
-           # print (self.conn.dataN['fool']+' '+self.conn.server+'/'+self.conn.dataN['chan']+': '+self.conn.dataN['msg'])
-            if self.plugin == default:
-                self.plugin.default(self.conn)
-            elif self.conn.dataN['fool'] in (self.conn.ignores + self.conn.banned):
-                return
-            else:
-                self.plugin.triggers[self.conn.dataN['words'][0]](self.conn)
-        except URLError, err :
-            conn.sendMsg("Plugin failed"+ self.plugin.__name__ + ': '+str(err))
-        except Exception, err:
-            print >> sys.stderr, str(err)
-           # exc_type, exc_obj, exc_tb = sys.exc_info()
-           # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-           # self.conn.sendMsg("Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,self.conn.dataN['chan'])
-            fln = traceback.format_exc().splitlines()
-          #  print fln
-            debugMsg = "Plugin failed: " + self.plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5]))
-            if self.conn.conn.debug:
-                self.conn.sendMsg(debugMsg)
-            else:
-                self.conn.sendMsg(debugMsg,self.conn.conn.admins[0])
+def PluginRunner(con,plugin):
+    if con.dataN:
+        conn = ircState(con)
+    else:
+        print "IRC data invalid. Plugin not run"
+        return
+    plugin = plugin
+    try:
+       # print (conn.dataN['fool']+' '+conn.server+'/'+conn.dataN['chan']+': '+conn.dataN['msg'])
+        if plugin == default:
+            plugin.default(conn)
+        elif conn.dataN['fool'] in (conn.ignores + conn.banned):
+            return
+        else:
+            plugin.triggers[conn.dataN['words'][0]](conn)
+    except URLError, err :
+        conn.sendMsg("Plugin failed"+ plugin.__name__ + ': '+str(err))
+    except Exception, err:
+        print >> sys.stderr, str(err)
+       # exc_type, exc_obj, exc_tb = sys.exc_info()
+       # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+       # conn.sendMsg("Plugin failed: " + plugin.__name__ + ': '+type(err).__name__+" "+(' '.join([str(fname), str(exc_tb.tb_lineno)]))+": "+ str(err) ,conn.dataN['chan'])
+        fln = traceback.format_exc().splitlines()
+      #  print fln
+        debugMsg = "Plugin failed: " + plugin.__name__ + ': '+type(err).__name__+" "+str(err)+(' '.join(fln[3:5]))
+        if conn.conn.debug:
+            conn.sendMsg(debugMsg)
+        else:
+            conn.sendMsg(debugMsg,conn.conn.admins[0])
         
 def check(pl,conn):
     for plugin in pl:
         if conn.dataN['fool'] not in (conn.ignores+conn.banned) and conn.dataN['words'][0] in plugin.triggers:
-            if conn.dataN['msg'].find('help') != -1:
+            if conn.dataN['words'][0] == '^help':
                 try:
                     conn.sendNot(plugin.help)
                     return
@@ -119,7 +120,7 @@ def check(pl,conn):
                     conn.sendNot("No help available")
 		    return
             else:
-                p = PluginRunner(conn,plugin)
+                p = Thread(target=PluginRunner,args=(conn,plugin),name="Plugin runner:"+str(plugin))
                 p.start()                   
                 return         
 

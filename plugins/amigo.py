@@ -19,17 +19,16 @@ def fortune(conn):
 def uname(conn):
     conn.sendMsg(subprocess.check_output(["uname","-a"]))
 def w(conn):
-  running = subprocess.check_output(["w","-hsf"]).split('\n')
+  running = subprocess.check_output(["w","-hsf"]).splitlines()
   users = dict()
-  for i in running[:-2]:
+  for i in running:
     j = i.split()
+    u = j[0]
     proc = (' '.join(j[3:]))
-    if proc.count('bash') != 0:
-      continue
-    if j[0] in users:
-      users[j[0]] = users[j[0]]+', '+proc
+    if u in users:
+      users[u] = users[u]+', '+proc
     else:
-      users[j[0]] = proc
+      users[u] = proc
   for i in users.items():
     conn.sendMsg(i[0]+': '+i[1])
                                           

@@ -3,6 +3,7 @@ from BeautifulSoup import BeautifulSoup
 import urllib2
 import json
 import xml.dom.minidom
+import random
 help = "^google <string> does a google search, ^urban <word> gets first urbandictionary def, ^weather <State> <Location> gets the weather from the BOM. Australia only!"
 
 def ip(conn):
@@ -119,7 +120,12 @@ def openBook(conn):
     del j
   except (IndexError, urllib2.HTTPError), e:
     conn.sendMsg("Usage is ^fb <search string>")
-  
+def cj(conn):
+    req = urllib2.Request('http://www.reddit.com/r/circlejerk+atheism/.json')
+    req.add_header('User-agent', 'TwatBot/')
+    page = json.load(urllib2.urlopen(req))
+    post = random.choice(page['data']['children'])['data']
+    conn.sendMsg(post['title']+" ("+post['domain']+","+post['subreddit']+") ( \x030,4+"+str(post['ups'])+"\x03 | \x030,2-"+str(post['downs'])+"\x03 )")
 triggers = {'^ud':urban,
             '^g':search,
             '^google':search,
@@ -127,5 +133,6 @@ triggers = {'^ud':urban,
             '^fmyl':fml,
             '^fb':openBook,
             '^etym':etymology,
-            '^ip':ip            
+            '^ip':ip,
+            '^circlejerk': cj
             }

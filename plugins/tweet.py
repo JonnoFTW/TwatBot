@@ -4,7 +4,7 @@ badwords = ["jihad","anal","nigger","fuck","global-jihad", "beatdownbrigade", "4
 tags = ["perwlcon","perwl","perl","python"]
 def getTwit(conn,user):
         try:
-            result = conn.api.GetUserTimeline(user)[0].text
+            result = conn.api.GetUserTimeline(user)[0]
         except Exception, e:
             result = 'Could not get twitter' + str(e)
         return result
@@ -16,6 +16,12 @@ def setTwit(conn,msg):
         except Exception, e:
             conn.sendMsg( 'Could not update twitter: '+ str(e) )
             return False
+
+def removeTweet(conn):
+    if conn.dataN['fool'] in conn.conn.admins:
+        t = getTwit(conn,"Buttsworth_")
+        conn.api.DestroyStatus(t.id)
+        conn.sendMsg("removed tweet: "+t.text)
 
 def tweet(conn):
     if conn.dataN['fool'] not in conn.banned and conn.dataN['chan'] not in conn.ignores:
@@ -46,10 +52,19 @@ def tweet(conn):
                 if r!= False: conn.sendMsg('Sending to twitter'+spaces) 
 
 def last(conn):
-    if len(conn.dataN['words']) > 1:
-        conn.sendMsg(getTwit(conn,conn.dataN['words'][1]))
-    else:
-        conn.sendMsg(getTwit(conn,'Buttsworth_'))
+    try:
+        user = conn.dataN['words'][1]
+    except:
+        user = "Buttsworth_"
+    t = getTwit(conn,user)
+    conn.sendMsg("%s at %s: %s " % (t.user.name,t.created_at,t.text))
 
-
-triggers = {'^twat':tweet,'^^':tweet,'^last':last}
+def twatter(conn):
+    try:
+       user = conn.dataN['words'][1]
+    except:
+       user = "Buttsworth_"
+    u = conn.api.GetUser(user)
+    conn.sendMsg("Info for user '%s' (@%s): Loc: %s; Url: %s; Statuses: %s; Followers: %s;" % (u.name,u.screen_name,u.location,u.url,u.statuses_count,u.followers_count))
+    
+triggers = {'^twat':tweet,'^^':tweet,'^last':last,'^untweet':removeTweet,'^twatter':twatter}
