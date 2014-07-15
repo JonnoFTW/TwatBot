@@ -1,5 +1,7 @@
 h1. TwatBot
 
+h2. THIS IS DEPRECATED PLEASE USE twatbot2
+
 An IRC bot to post to Twitter with plugin extensibility..
 
 h3. Features
